@@ -1,0 +1,20 @@
+{
+  "atom_id": "payoff_product_final",
+  "type": "shot",
+  "category": "payoff_cta",
+  "remotion_component": "ProductFinalShot",
+  "description": "产品最终展示镜头，全貌+品牌logo",
+  "required_inputs": [
+    "product_image"
+  ],
+  "fills_shot_types": [
+    "product_zoom_in"
+  ],
+  "duration_min_s": 2.0,
+  "duration_max_s": 4.0,
+  "visual_impact_score": 0.7,
+  "tech_stack": [
+    "remotion",
+    "ken_burns"
+  ]
+}

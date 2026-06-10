@@ -1,0 +1,12 @@
+node_modules
+data/
+*.mp4
+*.env
+.git
+dist
+web/dist
+web/node_modules
+services/node/node_modules
+services/python/__pycache__
+**/__pycache__
+**/*.pyc

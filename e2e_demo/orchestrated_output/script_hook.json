@@ -1,0 +1,67 @@
+{
+  "shots": [
+    {
+      "id": "hook_bg",
+      "role": "hook",
+      "component": "ParticleBg",
+      "props": {
+        "count": 25,
+        "color": "#FFD60A",
+        "secondaryColor": "#FF416C",
+        "style": "float",
+        "opacity": 0.3
+      },
+      "start": 0,
+      "duration": 90,
+      "position": "center"
+    },
+    {
+      "id": "hook_1",
+      "role": "hook",
+      "component": "KineticText",
+      "props": {
+        "text": "跑步总掉耳机？",
+        "mode": "bounce",
+        "fontSize": 64,
+        "color": "#FFFFFF",
+        "strokeColor": "#000000",
+        "strokeWidth": 3
+      },
+      "start": 0,
+      "duration": 27,
+      "position": "center"
+    },
+    {
+      "id": "hook_2",
+      "role": "hook",
+      "component": "ProductShowcase",
+      "props": {
+        "productImage": "product_camera.jpg",
+        "productName": "防脱落运动耳机",
+        "price": "¥299",
+        "cta": "了解更多"
+      },
+      "start": 27,
+      "duration": 30,
+      "position": "center"
+    },
+    {
+      "id": "hook_3",
+      "role": "hook",
+      "component": "PriceReveal",
+      "props": {
+        "originalPrice": "¥599",
+        "currentPrice": "¥299",
+        "badge": "限时特价",
+        "color": "#FF416C"
+      },
+      "start": 57,
+      "duration": 33,
+      "position": "center"
+    }
+  ],
+  "globalStyle": {
+    "bgColor": "#0A0A0A",
+    "palette": "viral"
+  }
+}

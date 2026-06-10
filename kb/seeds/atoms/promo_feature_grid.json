@@ -1,0 +1,13 @@
+{
+  "atom_id": "promo_feature_grid",
+  "type": "shot",
+  "category": "build",
+  "remotion_component": "FeatureGrid",
+  "description": "功能标签 + 卡片网格布局, 2x2 或 3x3, 交错 spring 入场",
+  "required_inputs": ["feature_labels"],
+  "fills_shot_types": ["feature_grid"],
+  "duration_min_s": 3.0,
+  "duration_max_s": 6.0,
+  "visual_impact_score": 0.85,
+  "tech_stack": ["remotion", "spring", "glassmorphism"]
+}

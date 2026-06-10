@@ -1,0 +1,174 @@
+{
+  "fps": 30,
+  "globalStyle": {
+    "bgColor": "#050510",
+    "palette": "promo"
+  },
+  "shots": [
+    {
+      "id": "full_hook_0",
+      "role": "hook",
+      "component": "WordReveal",
+      "props": {
+        "text": "你有没有想过，为什么你的朋友越来越少？",
+        "color": "#FFFFFF",
+        "delay": 0,
+        "fontSize": 96,
+        "staggerFrames": 3
+      },
+      "start": 0,
+      "duration": 120,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "full_hook_1",
+      "role": "hook",
+      "component": "GlowTrail",
+      "props": {
+        "color": "#3B82F6",
+        "delay": 0,
+        "trailLength": 5,
+        "dotSize": 6,
+        "pathD": "M 100 960 Q 300 200 540 280 T 980 200"
+      },
+      "start": 120,
+      "duration": 60,
+      "position": "center",
+      "transition": "none"
+    },
+    {
+      "id": "full_build_2",
+      "role": "build",
+      "component": "GlassCard",
+      "props": {
+        "text": "你是否也曾在深夜，翻看老照片，怀念那些一起笑、一起闹的时光？",
+        "width": 280,
+        "height": 200,
+        "float": false,
+        "delay": 0,
+        "glowColor": "#3B82F6"
+      },
+      "start": 234,
+      "duration": 120,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "full_build_3",
+      "role": "build",
+      "component": "FloatingMockup",
+      "props": {
+        "text": "",
+        "width": 300,
+        "height": 200,
+        "perspective": 1000,
+        "delay": 0,
+        "floatSpeed": 0.02,
+        "rotateY": 5.0
+      },
+      "start": 354,
+      "duration": 90,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "full_build_4",
+      "role": "build",
+      "component": "FeatureGrid",
+      "props": {
+        "features": [
+          {
+            "label": "Feature"
+          }
+        ],
+        "columns": 2,
+        "delay": 0,
+        "cardWidth": 280,
+        "cardHeight": 180
+      },
+      "start": 444,
+      "duration": 150,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "full_build_5",
+      "role": "build",
+      "component": "MarqueeText",
+      "props": {
+        "text": "回忆 · 故事 · 分享 · 珍藏 · 时光 · 情感 · 连接",
+        "color": "#FFFFFF",
+        "speed": 3.3,
+        "direction": "left",
+        "fontSize": 28
+      },
+      "start": 594,
+      "duration": 120,
+      "position": "lower",
+      "transition": "crossfade"
+    },
+    {
+      "id": "full_build_6",
+      "role": "build",
+      "component": "ParticleBg",
+      "props": {
+        "color": "#3B82F6",
+        "count": 25,
+        "style": "float",
+        "opacity": 0.3,
+        "secondaryColor": "#FF416C"
+      },
+      "start": 714,
+      "duration": 120,
+      "position": "center",
+      "transition": "none"
+    },
+    {
+      "id": "full_cta_7",
+      "role": "cta",
+      "component": "GradientText",
+      "props": {
+        "text": "立即行动，开启你的专属旅程",
+        "delay": 0,
+        "fontSize": 96,
+        "fontWeight": 800,
+        "shimmerSpeed": 0.02
+      },
+      "start": 1029,
+      "duration": 120,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "full_cta_8",
+      "role": "cta",
+      "component": "LogoReveal",
+      "props": {
+        "delay": 0,
+        "glowColor": "#3B82F6",
+        "logoText": "Brand"
+      },
+      "start": 1149,
+      "duration": 90,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "full_cta_9",
+      "role": "cta",
+      "component": "MarqueeText",
+      "props": {
+        "text": "探索更多 · 分享快乐 · 创造回忆 · 连接你我",
+        "color": "#FFFFFF",
+        "speed": 1,
+        "direction": "left",
+        "fontSize": 28
+      },
+      "start": 1239,
+      "duration": 180,
+      "position": "lower",
+      "transition": "none"
+    }
+  ]
+}

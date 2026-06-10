@@ -1,0 +1,20 @@
+{
+  "atom_id": "build_texture_closeup",
+  "type": "shot",
+  "category": "build",
+  "remotion_component": "TextureCloseup",
+  "description": "材质纹理特写，展示产品的精细质感",
+  "required_inputs": [
+    "texture_image"
+  ],
+  "fills_shot_types": [
+    "product_zoom_in"
+  ],
+  "duration_min_s": 1.5,
+  "duration_max_s": 3.5,
+  "visual_impact_score": 0.7,
+  "tech_stack": [
+    "remotion",
+    "ken_burns"
+  ]
+}

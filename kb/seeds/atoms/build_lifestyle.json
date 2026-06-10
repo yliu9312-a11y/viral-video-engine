@@ -1,0 +1,20 @@
+{
+  "atom_id": "build_lifestyle",
+  "type": "shot",
+  "category": "build",
+  "remotion_component": "LifestyleFrame",
+  "description": "生活方式场景，展示产品融入日常的自然画面",
+  "required_inputs": [
+    "lifestyle_image"
+  ],
+  "fills_shot_types": [
+    "usage_scenario"
+  ],
+  "duration_min_s": 2.0,
+  "duration_max_s": 5.0,
+  "visual_impact_score": 0.75,
+  "tech_stack": [
+    "remotion",
+    "ken_burns"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "atom_id": "promo_word_reveal",
+  "type": "shot",
+  "category": "hook",
+  "remotion_component": "WordReveal",
+  "description": "逐词渐变文字揭示, 每词 opacity+translateY spring 入场, 支持渐变色",
+  "required_inputs": ["text_content"],
+  "fills_shot_types": ["word_reveal"],
+  "duration_min_s": 3.0,
+  "duration_max_s": 8.0,
+  "visual_impact_score": 0.85,
+  "tech_stack": ["remotion", "spring", "gradient_text"]
+}

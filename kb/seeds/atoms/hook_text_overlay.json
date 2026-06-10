@@ -1,0 +1,14 @@
+{
+  "atom_id": "hook_text_overlay",
+  "type": "caption",
+  "category": "hook",
+  "remotion_component": "TitleBar",
+  "description": "文字覆盖层，用于开头展示吸引性标题文案",
+  "required_inputs": ["text_content"],
+  "fills_shot_types": ["text_overlay"],
+  "has_3d_fallback": null,
+  "duration_min_s": 2.0,
+  "duration_max_s": 5.0,
+  "visual_impact_score": 0.7,
+  "tech_stack": ["remotion", "gsap"]
+}

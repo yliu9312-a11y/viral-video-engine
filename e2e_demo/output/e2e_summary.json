@@ -1,0 +1,45 @@
+{
+  "s1": {
+    "shots": 5,
+    "duration": 25.0,
+    "fps": 25.0,
+    "resolution": "1080x1920",
+    "output_dir": "/Users/adrian-us/viral-video-engine/e2e_demo/output/s1",
+    "elapsed": 24.91
+  },
+  "s2": {
+    "template_id": "tpl_eed6b8fb",
+    "category": "通用",
+    "phases": 3,
+    "template_path": "/Users/adrian-us/viral-video-engine/e2e_demo/output/s2/structure_template.json",
+    "elapsed": 16.46
+  },
+  "gap": {
+    "total_gaps": 3,
+    "severity": "LOW",
+    "gap_report_path": "/Users/adrian-us/viral-video-engine/e2e_demo/output/gap/gap_report.json",
+    "elapsed": 31.78
+  },
+  "assign": {
+    "phases": 3,
+    "strategies": [
+      "B",
+      "E"
+    ],
+    "total_duration": 9.0,
+    "assignment_path": "/Users/adrian-us/viral-video-engine/e2e_demo/output/assign/material_assignment.json",
+    "elapsed": 71.07
+  },
+  "render": {
+    "success": false,
+    "reason": "skipped"
+  },
+  "kb": {
+    "decision": "merge_existing",
+    "reason": "high vector similarity",
+    "target_tid": "tpl_digital_01",
+    "new_tids": [],
+    "similar_count": 5,
+    "elapsed": 19.1
+  }
+}

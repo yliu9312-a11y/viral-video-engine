@@ -1,0 +1,31 @@
+{
+  "module_id": "mod_build_tutorial",
+  "phase": "build",
+  "narrative_pattern": "教程演示",
+  "script_template": "第一步{准备}，第二步{操作}，第三步{完成}",
+  "duration_min_s": 6.0,
+  "duration_max_s": 12.0,
+  "description": "教程式内容构建，分步骤展示使用方法",
+  "atoms": [
+    {
+      "atom_id": "build_tutorial_step",
+      "weight": 0.3,
+      "optional": false
+    },
+    {
+      "atom_id": "build_usage_scenario",
+      "weight": 0.3,
+      "optional": false
+    },
+    {
+      "atom_id": "build_product_zoom",
+      "weight": 0.2,
+      "optional": false
+    },
+    {
+      "atom_id": "build_feature_highlight",
+      "weight": 0.2,
+      "optional": true
+    }
+  ]
+}

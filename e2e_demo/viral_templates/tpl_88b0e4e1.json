@@ -1,0 +1,98 @@
+{
+  "template_id": "tpl_88b0e4e1",
+  "source_videos": [],
+  "category": "生活",
+  "duration_range": [
+    25,
+    35
+  ],
+  "narrative": {
+    "hook_type": "悬念_留白",
+    "build_pattern": "使用场景_沉浸体验",
+    "cta_type": "互动提问"
+  },
+  "timeline": [
+    {
+      "phase": "hook",
+      "duration_pct": [
+        0.15,
+        0.25
+      ],
+      "shot_count_range": [
+        1,
+        2
+      ],
+      "avg_shot_length_s": 4.0,
+      "required_shot_types": [
+        "outdoor_scene",
+        "text_overlay"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFFFFF",
+        "size": "large",
+        "position": "bottom_third",
+        "animation": "typewriter_fast"
+      },
+      "audio_energy": "high",
+      "bgm_role": "节奏带动"
+    },
+    {
+      "phase": "build",
+      "duration_pct": [
+        0.5,
+        0.65
+      ],
+      "shot_count_range": [
+        3,
+        5
+      ],
+      "avg_shot_length_s": 3.5,
+      "required_shot_types": [
+        "face_closeup",
+        "product_usage",
+        "lifestyle_broll",
+        "outdoor_scene"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFFFFF",
+        "size": "medium",
+        "position": "bottom_third",
+        "animation": "slide_up"
+      },
+      "audio_energy": "medium",
+      "bgm_role": "背景铺垫"
+    },
+    {
+      "phase": "payoff_cta",
+      "duration_pct": [
+        0.15,
+        0.25
+      ],
+      "shot_count_range": [
+        1,
+        2
+      ],
+      "avg_shot_length_s": 3.0,
+      "required_shot_types": [
+        "indoor_scene"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFD700",
+        "size": "xlarge",
+        "position": "center",
+        "animation": "glow"
+      },
+      "audio_energy": "high",
+      "bgm_role": "高潮推动"
+    }
+  ],
+  "rhythm_profile": {
+    "avg_shot_length_s": 3.5,
+    "shot_length_variance": "low",
+    "energy_curve": "ascending"
+  },
+  "cta_type": "互动提问"
+}

@@ -1,0 +1,20 @@
+{
+  "atom_id": "build_comparison",
+  "type": "shot",
+  "category": "build",
+  "remotion_component": "ComparisonDemo",
+  "description": "对比演示，竞品对比或使用前后对比",
+  "required_inputs": [
+    "item_a_image",
+    "item_b_image"
+  ],
+  "fills_shot_types": [
+    "before_after"
+  ],
+  "duration_min_s": 3.0,
+  "duration_max_s": 6.0,
+  "visual_impact_score": 0.84,
+  "tech_stack": [
+    "remotion"
+  ]
+}

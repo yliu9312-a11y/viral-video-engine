@@ -1,0 +1,20 @@
+{
+  "atom_id": "hook_number_list",
+  "type": "caption",
+  "category": "hook",
+  "remotion_component": "NumberListIntro",
+  "description": "数字列表式开头，如'3个方法让你...'",
+  "required_inputs": [
+    "number",
+    "topic_text"
+  ],
+  "fills_shot_types": [
+    "text_overlay"
+  ],
+  "duration_min_s": 2.0,
+  "duration_max_s": 4.0,
+  "visual_impact_score": 0.68,
+  "tech_stack": [
+    "remotion"
+  ]
+}

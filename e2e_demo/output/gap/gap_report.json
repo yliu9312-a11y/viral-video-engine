@@ -1,0 +1,122 @@
+{
+  "template_id": "tpl_eed6b8fb",
+  "material_count": 5,
+  "materials": [
+    {
+      "path": "/Users/adrian-us/viral-video-engine/e2e_demo/materials/product_camera.jpg",
+      "type": "image",
+      "tagged_types": [
+        "general"
+      ],
+      "duration": 3.0,
+      "description": ""
+    },
+    {
+      "path": "/Users/adrian-us/viral-video-engine/e2e_demo/materials/product_headphones.jpg",
+      "type": "image",
+      "tagged_types": [
+        "general"
+      ],
+      "duration": 3.0,
+      "description": ""
+    },
+    {
+      "path": "/Users/adrian-us/viral-video-engine/e2e_demo/materials/product_shoe.jpg",
+      "type": "image",
+      "tagged_types": [
+        "general"
+      ],
+      "duration": 3.0,
+      "description": ""
+    },
+    {
+      "path": "/Users/adrian-us/viral-video-engine/e2e_demo/materials/product_watch.jpg",
+      "type": "image",
+      "tagged_types": [
+        "general"
+      ],
+      "duration": 3.0,
+      "description": ""
+    },
+    {
+      "path": "/Users/adrian-us/viral-video-engine/e2e_demo/materials/scene_lifestyle.jpg",
+      "type": "image",
+      "tagged_types": [
+        "general"
+      ],
+      "duration": 3.0,
+      "description": ""
+    }
+  ],
+  "gaps": [
+    {
+      "phase": "hook",
+      "missing_shot_types": [
+        "镜头类型"
+      ],
+      "duration_shortfall": 3.0,
+      "shot_count_shortfall": 1,
+      "low_quality_count": 0,
+      "severity": "MEDIUM",
+      "impact_on_video": "缺少镜头类型，会让开头吸引环节的表现力下降，预估完播率受影响。",
+      "recommended_strategies": [
+        {
+          "id": "B",
+          "name": "字幕补全",
+          "description": "加大字幕信息密度，用文字承载缺失画面的语义",
+          "priority": 5
+        }
+      ]
+    },
+    {
+      "phase": "build",
+      "missing_shot_types": [
+        "镜头类型"
+      ],
+      "duration_shortfall": 3.0,
+      "shot_count_shortfall": 2,
+      "low_quality_count": 0,
+      "severity": "MEDIUM",
+      "impact_on_video": "缺少镜头类型，会让中段展示环节的表现力下降，预估完播率受影响。",
+      "recommended_strategies": [
+        {
+          "id": "E",
+          "name": "素材重组",
+          "description": "对现有素材做 Ken Burns、变速、反向、裁剪等变换复用",
+          "priority": 4
+        },
+        {
+          "id": "B",
+          "name": "字幕补全",
+          "description": "加大字幕信息密度，用文字承载缺失画面的语义",
+          "priority": 5
+        }
+      ]
+    },
+    {
+      "phase": "payoff_cta",
+      "missing_shot_types": [
+        "镜头类型"
+      ],
+      "duration_shortfall": 3.0,
+      "shot_count_shortfall": 1,
+      "low_quality_count": 0,
+      "severity": "MEDIUM",
+      "impact_on_video": "缺少镜头类型，会让收尾转化环节的表现力下降，预估完播率受影响。",
+      "recommended_strategies": [
+        {
+          "id": "B",
+          "name": "字幕补全",
+          "description": "加大字幕信息密度，用文字承载缺失画面的语义",
+          "priority": 5
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_gaps": 3,
+    "high_severity": 0,
+    "medium_severity": 3,
+    "low_severity": 0
+  }
+}

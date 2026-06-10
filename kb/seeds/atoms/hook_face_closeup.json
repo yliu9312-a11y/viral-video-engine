@@ -1,0 +1,20 @@
+{
+  "atom_id": "hook_face_closeup",
+  "type": "shot",
+  "category": "hook",
+  "remotion_component": "FaceCloseupFrame",
+  "description": "面部特写镜头，展示真实人物表情，快速建立信任感",
+  "required_inputs": [
+    "face_video_or_image"
+  ],
+  "fills_shot_types": [
+    "face_closeup"
+  ],
+  "duration_min_s": 1.5,
+  "duration_max_s": 4.0,
+  "visual_impact_score": 0.85,
+  "tech_stack": [
+    "remotion",
+    "ken_burns"
+  ]
+}

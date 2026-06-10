@@ -1,0 +1,93 @@
+{
+  "template_id": "tpl_8a77a33f",
+  "source_videos": [],
+  "category": "美妆",
+  "duration_range": [
+    15,
+    30
+  ],
+  "narrative": {
+    "hook_type": "反常识_颠覆认知",
+    "build_pattern": "变化过程_前后对比",
+    "cta_type": "限时优惠"
+  },
+  "timeline": [
+    {
+      "phase": "hook",
+      "duration_pct": [
+        0.15,
+        0.25
+      ],
+      "shot_count_range": [
+        1,
+        2
+      ],
+      "avg_shot_length_s": 3.0,
+      "required_shot_types": [
+        "step_demo",
+        "product_closeup"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFFFFF",
+        "size": "large",
+        "position": "bottom_third",
+        "animation": "typewriter_fast"
+      },
+      "audio_energy": "high",
+      "bgm_role": "节奏带动"
+    },
+    {
+      "phase": "build",
+      "duration_pct": [
+        0.5,
+        0.65
+      ],
+      "shot_count_range": [
+        3,
+        5
+      ],
+      "avg_shot_length_s": 3.5,
+      "required_shot_types": [
+        "before_after",
+        "product_closeup",
+        "face_closeup",
+        "step_demo"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFFFFF",
+        "size": "medium",
+        "position": "bottom_third",
+        "animation": "fade_in"
+      },
+      "audio_energy": "medium",
+      "bgm_role": "背景铺垫"
+    },
+    {
+      "phase": "payoff_cta",
+      "duration_pct": [
+        0.15,
+        0.25
+      ],
+      "shot_count_range": [
+        1,
+        2
+      ],
+      "avg_shot_length_s": 4.0,
+      "required_shot_types": [
+        "product_closeup",
+        "face_closeup"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFD700",
+        "size": "xlarge",
+        "position": "center",
+        "animation": "bounce_in"
+      },
+      "audio_energy": "high",
+      "bgm_role": "高潮推动"
+    }
+  ]
+}

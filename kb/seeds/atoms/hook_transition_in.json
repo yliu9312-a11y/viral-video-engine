@@ -1,0 +1,18 @@
+{
+  "atom_id": "hook_transition_in",
+  "type": "transition",
+  "category": "hook",
+  "remotion_component": "TransitionWipe",
+  "description": "入场转场动效，从黑屏/模糊到清晰画面",
+  "required_inputs": [],
+  "fills_shot_types": [
+    "transition"
+  ],
+  "duration_min_s": 0.5,
+  "duration_max_s": 1.5,
+  "visual_impact_score": 0.6,
+  "tech_stack": [
+    "remotion",
+    "gsap"
+  ]
+}

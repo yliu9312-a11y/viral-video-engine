@@ -1,0 +1,41 @@
+{
+  "fps": 30,
+  "globalStyle": {
+    "bgColor": "#050510",
+    "palette": "promo"
+  },
+  "shots": [
+    {
+      "id": "hook_0",
+      "role": "hook",
+      "component": "WordReveal",
+      "props": {
+        "text": "你有没有想过，为什么你的朋友越来越少？",
+        "color": "#FFFFFF",
+        "delay": 0,
+        "fontSize": 96,
+        "staggerFrames": 3
+      },
+      "start": 0,
+      "duration": 120,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "hook_1",
+      "role": "hook",
+      "component": "GlowTrail",
+      "props": {
+        "color": "#3B82F6",
+        "delay": 0,
+        "trailLength": 5,
+        "dotSize": 6,
+        "pathD": "M 100 960 Q 300 200 540 280 T 980 200"
+      },
+      "start": 120,
+      "duration": 60,
+      "position": "center",
+      "transition": "none"
+    }
+  ]
+}

@@ -1,0 +1,209 @@
+{
+  "template_id": "tpl_friendship_01",
+  "source_videos": ["123605298.mov"],
+  "category": "生活",
+  "duration_range": [34, 44],
+  "narrative": {
+    "hook_type": "悬念反问",
+    "build_pattern": "故事叙述",
+    "cta_type": "直接索取",
+    "narrative_arc": "从孤独疑问到温暖陪伴，展示友谊的不同瞬间"
+  },
+  "timeline": [
+    {
+      "phase": "hook",
+      "duration_pct": [0.0, 0.15],
+      "shot_count_range": [1, 2],
+      "avg_shot_length_s": 5.0,
+      "required_shot_types": ["text_overlay"],
+      "screen_text": "What if a friend was always there?"
+    },
+    {
+      "phase": "build",
+      "duration_pct": [0.15, 0.88],
+      "shot_count_range": [3, 6],
+      "avg_shot_length_s": 3.5,
+      "required_shot_types": ["text_overlay", "lifestyle_broll"],
+      "moments": ["laughing together", "helping hand", "shared memories", "warm hug"]
+    },
+    {
+      "phase": "payoff_cta",
+      "duration_pct": [0.88, 1.0],
+      "shot_count_range": [1, 2],
+      "avg_shot_length_s": 4.0,
+      "required_shot_types": ["text_overlay"],
+      "screen_text": "Stop scrolling, start connecting."
+    }
+  ],
+  "beat_sheet": {
+    "source": "Layout.dev product promo (Studio Both Sides)",
+    "beats": [
+      {
+        "beat": 0,
+        "id": "hook",
+        "label": "Hook — 逐词揭示钩子文案",
+        "duration_s": 6,
+        "components": [
+          {
+            "ref": "WordReveal",
+            "role": "hero",
+            "position": "center",
+            "content_hint": "英文短句, ≤10词, 悬念反问",
+            "props_hint": { "fontSize": 48, "staggerFrames": 4, "gradient": "linear-gradient(90deg, #9CA3AF, #FFFFFF, #3B82F6)" }
+          },
+          {
+            "ref": "GlowTrail",
+            "role": "decorative",
+            "position": "center",
+            "content_hint": "无需文字内容",
+            "props_hint": { "pathD": "M 100,800 Q 300,200 540,300", "delay": 30 }
+          }
+        ],
+        "layering": "WordReveal 居中 + GlowTrail 弧线同时出现，GlowTrail 在 WordReveal 之下"
+      },
+      {
+        "beat": 1,
+        "id": "typewriter",
+        "label": "Typewriter — 打字机输入 prompt",
+        "duration_s": 4,
+        "components": [
+          {
+            "ref": "TypewriterPrompt",
+            "role": "hero",
+            "position": "center",
+            "content_hint": "描述友谊场景的英文短句, 如 'Remember that time we stayed up all night talking?'",
+            "props_hint": { "charInterval": 1, "delay": 10 }
+          }
+        ],
+        "layering": "单组件居中"
+      },
+      {
+        "beat": 2,
+        "id": "features",
+        "label": "Features — 玻璃卡片 + 底部跑马灯",
+        "duration_s": 12,
+        "components": [
+          {
+            "ref": "GlassCard",
+            "role": "content_cards",
+            "position": "center",
+            "content_hint": "3张友谊时刻卡片, 每张含 emoji+标题+描述",
+            "props_hint": { "width": 260, "height": 200, "float": true },
+            "repeat": 3,
+            "items_hint": [
+              { "icon": "😂", "title": "Laughing Together", "desc": "那些一起笑到肚子疼的瞬间" },
+              { "icon": "🤝", "title": "Helping Hand", "desc": "困难时从不缺席" },
+              { "icon": "🌅", "title": "Shared Memories", "desc": "共同走过的每一段路" }
+            ]
+          },
+          {
+            "ref": "MarqueeText",
+            "role": "bottom_ticker",
+            "position": "lower",
+            "content_hint": "友谊关键词跑马灯",
+            "props_hint": { "text": "Laugh  •  Share  •  Grow  •  Support  •  Memories  •  Together", "speed": 2.5, "fontSize": 24 }
+          }
+        ],
+        "layering": "GlassCard×3 居中排列 + MarqueeText 底部同时出现"
+      },
+      {
+        "beat": 3,
+        "id": "payoff",
+        "label": "Payoff — 渐变大字 slogan",
+        "duration_s": 5,
+        "components": [
+          {
+            "ref": "GradientText",
+            "role": "hero",
+            "position": "center",
+            "content_hint": "英文金句, ≤6词, 如 'From strangers to soulmates'",
+            "props_hint": { "fontSize": 52, "fontWeight": 800, "gradient": "linear-gradient(90deg, #9CA3AF, #FFFFFF, #3B82F6)" }
+          }
+        ],
+        "layering": "单组件居中, 大字 shimmer"
+      },
+      {
+        "beat": 4,
+        "id": "grid",
+        "label": "Feature Grid — 大字标签网格",
+        "duration_s": 4,
+        "components": [
+          {
+            "ref": "FeatureGrid",
+            "role": "grid",
+            "position": "center",
+            "content_hint": "4个友谊品质标签",
+            "props_hint": { "columns": 2 },
+            "items_hint": [
+              { "label": "Trust", "icon": "🛡️", "description": "无条件信任" },
+              { "label": "Loyalty", "icon": "💎", "description": "始终如一" },
+              { "label": "Growth", "icon": "🌱", "description": "共同成长" },
+              { "label": "Joy", "icon": "✨", "description": "快乐加倍" }
+            ]
+          }
+        ],
+        "layering": "单组件居中, 2×2 网格"
+      },
+      {
+        "beat": 5,
+        "id": "closing",
+        "label": "Closing — 渐变文字 + 底部跑马灯",
+        "duration_s": 5,
+        "components": [
+          {
+            "ref": "GradientText",
+            "role": "hero",
+            "position": "center",
+            "content_hint": "CTA 英文短句, 如 'Stop scrolling, start connecting'",
+            "props_hint": { "fontSize": 48, "fontWeight": 800, "gradient": "linear-gradient(90deg, #6B7280, #FFFFFF, #3B82F6)" }
+          },
+          {
+            "ref": "MarqueeText",
+            "role": "bottom_ticker",
+            "position": "lower",
+            "content_hint": "品牌关键词",
+            "props_hint": { "text": "Friendship  •  Connection  •  Together  •  Always", "speed": 2, "fontSize": 20 }
+          }
+        ],
+        "layering": "GradientText 居中 + MarqueeText 底部同时出现"
+      },
+      {
+        "beat": 6,
+        "id": "logo",
+        "label": "Logo — Logo 弹入 + 蓝色辉光",
+        "duration_s": 2,
+        "components": [
+          {
+            "ref": "LogoReveal",
+            "role": "logo",
+            "position": "center",
+            "content_hint": "品牌名",
+            "props_hint": { "logoText": "SoulCircle", "logoIcon": "💛", "glowColor": "#3B82F6" }
+          }
+        ],
+        "layering": "单组件居中"
+      }
+    ]
+  },
+  "audio_template": {
+    "bpm_range": [80, 120],
+    "beat_align_strength": "medium",
+    "energy_curve": "rising",
+    "mood": "warm, nostalgic, uplifting"
+  },
+  "packaging": {
+    "transitions": ["fade", "cut", "dissolve"],
+    "sticker_density_per_sec": 0.0,
+    "title_bar": {"style": "minimal", "appears_at_phases": ["hook"]},
+    "cover_style": "warm",
+    "color_palette": ["#FF6B35", "#FFA07A", "#FFF8DC", "#2C1810"],
+    "use_3d_elements": false
+  },
+  "materials": [
+    {"path": "materials/friend_laugh.jpg", "phase": "build", "description": "friends laughing"},
+    {"path": "materials/friend_hand.jpg", "phase": "build", "description": "helping hand"},
+    {"path": "materials/friend_memories.jpg", "phase": "build", "description": "shared memories"},
+    {"path": "materials/friend_hug.jpg", "phase": "build", "description": "warm hug"},
+    {"path": "materials/friend_logo.jpg", "phase": "payoff_cta", "description": "brand logo"}
+  ]
+}

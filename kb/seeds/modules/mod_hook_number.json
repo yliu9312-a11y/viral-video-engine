@@ -1,0 +1,26 @@
+{
+  "module_id": "mod_hook_number",
+  "phase": "hook",
+  "narrative_pattern": "数字利益点",
+  "script_template": "{数字}个方法让你{利益点}",
+  "duration_min_s": 3.0,
+  "duration_max_s": 5.0,
+  "description": "数字列表式开场，直接给出利益点",
+  "atoms": [
+    {
+      "atom_id": "hook_number_list",
+      "weight": 0.5,
+      "optional": false
+    },
+    {
+      "atom_id": "hook_attention_grab",
+      "weight": 0.3,
+      "optional": false
+    },
+    {
+      "atom_id": "hook_transition_in",
+      "weight": 0.2,
+      "optional": true
+    }
+  ]
+}

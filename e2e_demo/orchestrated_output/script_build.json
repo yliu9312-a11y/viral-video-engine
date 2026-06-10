@@ -1,0 +1,83 @@
+{
+  "shots": [
+    {
+      "id": "build_bg",
+      "role": "build",
+      "component": "ParticleBg",
+      "props": {
+        "count": 25,
+        "color": "#FFD60A",
+        "secondaryColor": "#FF416C",
+        "style": "float",
+        "opacity": 0.3
+      },
+      "start": 0,
+      "duration": 90,
+      "position": "center"
+    },
+    {
+      "id": "build_1",
+      "role": "build",
+      "component": "KineticText",
+      "props": {
+        "text": "还在为耳机总掉、手表不耐摔、鞋子不跟脚而烦恼？",
+        "mode": "bounce",
+        "fontSize": 64,
+        "color": "#FFFFFF",
+        "strokeColor": "#000000",
+        "strokeWidth": 3
+      },
+      "start": 0,
+      "duration": 30,
+      "position": "center"
+    },
+    {
+      "id": "build_2",
+      "role": "build",
+      "component": "ProductShowcase",
+      "props": {
+        "productImage": "product_camera.jpg",
+        "productName": "依次展示防脱落运动耳机",
+        "price": "",
+        "cta": "了解更多"
+      },
+      "start": 30,
+      "duration": 30,
+      "position": "center"
+    },
+    {
+      "id": "build_3",
+      "role": "build",
+      "component": "KineticText",
+      "props": {
+        "text": "稳固不掉落",
+        "mode": "bounce",
+        "fontSize": 64,
+        "color": "#FFFFFF",
+        "strokeColor": "#000000",
+        "strokeWidth": 3
+      },
+      "start": 60,
+      "duration": 30,
+      "position": "center"
+    },
+    {
+      "id": "build_4",
+      "role": "build",
+      "component": "PriceReveal",
+      "props": {
+        "originalPrice": "¥599",
+        "currentPrice": "¥1299",
+        "badge": "限时特价",
+        "color": "#FF416C"
+      },
+      "start": 90,
+      "duration": 30,
+      "position": "center"
+    }
+  ],
+  "globalStyle": {
+    "bgColor": "#0A0A0A",
+    "palette": "viral"
+  }
+}

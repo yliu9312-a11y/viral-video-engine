@@ -1,0 +1,55 @@
+{
+  "fps": 30,
+  "globalStyle": {
+    "bgColor": "#050510",
+    "palette": "promo"
+  },
+  "shots": [
+    {
+      "id": "cta_0",
+      "role": "cta",
+      "component": "GradientText",
+      "props": {
+        "text": "立即行动，开启你的专属旅程",
+        "delay": 0,
+        "fontSize": 96,
+        "fontWeight": 800,
+        "shimmerSpeed": 0.02
+      },
+      "start": 0,
+      "duration": 120,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "cta_1",
+      "role": "cta",
+      "component": "LogoReveal",
+      "props": {
+        "delay": 0,
+        "glowColor": "#3B82F6",
+        "logoText": "Brand"
+      },
+      "start": 120,
+      "duration": 90,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "cta_2",
+      "role": "cta",
+      "component": "MarqueeText",
+      "props": {
+        "text": "探索更多 · 分享快乐 · 创造回忆 · 连接你我",
+        "color": "#FFFFFF",
+        "speed": 1,
+        "direction": "left",
+        "fontSize": 28
+      },
+      "start": 210,
+      "duration": 180,
+      "position": "lower",
+      "transition": "none"
+    }
+  ]
+}

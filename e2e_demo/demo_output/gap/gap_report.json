@@ -1,0 +1,157 @@
+{
+  "template_id": "tpl_product_review_demo",
+  "material_count": 5,
+  "materials": [
+    {
+      "path": "/Users/adrian-us/viral-video-engine/e2e_demo/materials/product_camera.jpg",
+      "type": "image",
+      "tagged_types": [
+        "general"
+      ],
+      "duration": 3.0,
+      "description": ""
+    },
+    {
+      "path": "/Users/adrian-us/viral-video-engine/e2e_demo/materials/product_headphones.jpg",
+      "type": "image",
+      "tagged_types": [
+        "general"
+      ],
+      "duration": 3.0,
+      "description": ""
+    },
+    {
+      "path": "/Users/adrian-us/viral-video-engine/e2e_demo/materials/product_shoe.jpg",
+      "type": "image",
+      "tagged_types": [
+        "general"
+      ],
+      "duration": 3.0,
+      "description": ""
+    },
+    {
+      "path": "/Users/adrian-us/viral-video-engine/e2e_demo/materials/product_watch.jpg",
+      "type": "image",
+      "tagged_types": [
+        "general"
+      ],
+      "duration": 3.0,
+      "description": ""
+    },
+    {
+      "path": "/Users/adrian-us/viral-video-engine/e2e_demo/materials/scene_lifestyle.jpg",
+      "type": "image",
+      "tagged_types": [
+        "general"
+      ],
+      "duration": 3.0,
+      "description": ""
+    }
+  ],
+  "gaps": [
+    {
+      "phase": "hook",
+      "missing_shot_types": [
+        "text_overlay",
+        "face_closeup"
+      ],
+      "duration_shortfall": 3.0,
+      "shot_count_shortfall": 2,
+      "low_quality_count": 0,
+      "severity": "HIGH",
+      "impact_on_video": "缺少文字画面、人脸特写，会让开头吸引环节的表现力下降，预估完播率受影响。",
+      "recommended_strategies": [
+        {
+          "id": "A",
+          "name": "结构重排",
+          "description": "跳过 hook phase，直接从 build 开场，或 hook 改纯字幕",
+          "priority": 1
+        },
+        {
+          "id": "C",
+          "name": "包装补全",
+          "description": "用 Remotion 组件（标题条、卖点卡片、贴纸）填充缺失画面",
+          "priority": 2
+        },
+        {
+          "id": "E",
+          "name": "素材重组",
+          "description": "对现有素材做 Ken Burns、变速、反向、裁剪等变换复用",
+          "priority": 4
+        },
+        {
+          "id": "B",
+          "name": "字幕补全",
+          "description": "加大字幕信息密度，用文字承载缺失画面的语义",
+          "priority": 5
+        }
+      ]
+    },
+    {
+      "phase": "build",
+      "missing_shot_types": [
+        "text_overlay",
+        "product_closeup",
+        "product_usage",
+        "before_after"
+      ],
+      "duration_shortfall": 3.0,
+      "shot_count_shortfall": 3,
+      "low_quality_count": 0,
+      "severity": "HIGH",
+      "impact_on_video": "缺少文字画面、product_closeup、product_usage、对比画面，会让中段展示环节的表现力下降，预估完播率受影响。",
+      "recommended_strategies": [
+        {
+          "id": "C",
+          "name": "包装补全",
+          "description": "用 Remotion 组件（标题条、卖点卡片、贴纸）填充缺失画面",
+          "priority": 2
+        },
+        {
+          "id": "E",
+          "name": "素材重组",
+          "description": "对现有素材做 Ken Burns、变速、反向、裁剪等变换复用",
+          "priority": 4
+        },
+        {
+          "id": "B",
+          "name": "字幕补全",
+          "description": "加大字幕信息密度，用文字承载缺失画面的语义",
+          "priority": 5
+        }
+      ]
+    },
+    {
+      "phase": "payoff_cta",
+      "missing_shot_types": [
+        "text_overlay",
+        "product_closeup"
+      ],
+      "duration_shortfall": 3.0,
+      "shot_count_shortfall": 1,
+      "low_quality_count": 0,
+      "severity": "HIGH",
+      "impact_on_video": "缺少文字画面、product_closeup，会让收尾转化环节的表现力下降，预估完播率受影响。",
+      "recommended_strategies": [
+        {
+          "id": "C",
+          "name": "包装补全",
+          "description": "用 Remotion 组件（标题条、卖点卡片、贴纸）填充缺失画面",
+          "priority": 2
+        },
+        {
+          "id": "B",
+          "name": "字幕补全",
+          "description": "加大字幕信息密度，用文字承载缺失画面的语义",
+          "priority": 5
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_gaps": 3,
+    "high_severity": 3,
+    "medium_severity": 0,
+    "low_severity": 0
+  }
+}

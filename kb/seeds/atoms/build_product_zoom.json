@@ -1,0 +1,20 @@
+{
+  "atom_id": "build_product_zoom",
+  "type": "shot",
+  "category": "build",
+  "remotion_component": "ProductZoomFrame",
+  "description": "产品特写镜头，展示细节和质感",
+  "required_inputs": [
+    "product_image_or_video"
+  ],
+  "fills_shot_types": [
+    "product_zoom_in"
+  ],
+  "duration_min_s": 2.0,
+  "duration_max_s": 5.0,
+  "visual_impact_score": 0.8,
+  "tech_stack": [
+    "remotion",
+    "ken_burns"
+  ]
+}

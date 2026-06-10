@@ -1,0 +1,31 @@
+{
+  "module_id": "mod_payoff_urgency",
+  "phase": "payoff_cta",
+  "narrative_pattern": "限时紧迫",
+  "script_template": "限时{优惠}，点击{行动}，{社会认同}人已购买",
+  "duration_min_s": 3.0,
+  "duration_max_s": 6.0,
+  "description": "紧迫感收尾，限时优惠+社会认同双重驱动",
+  "atoms": [
+    {
+      "atom_id": "payoff_limited_offer",
+      "weight": 0.3,
+      "optional": false
+    },
+    {
+      "atom_id": "payoff_cta_button",
+      "weight": 0.3,
+      "optional": false
+    },
+    {
+      "atom_id": "payoff_social_proof",
+      "weight": 0.2,
+      "optional": false
+    },
+    {
+      "atom_id": "payoff_price_reveal",
+      "weight": 0.2,
+      "optional": true
+    }
+  ]
+}

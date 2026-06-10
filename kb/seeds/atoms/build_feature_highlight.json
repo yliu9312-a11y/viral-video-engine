@@ -1,0 +1,21 @@
+{
+  "atom_id": "build_feature_highlight",
+  "type": "shot",
+  "category": "build",
+  "remotion_component": "FeatureHighlight",
+  "description": "产品卖点高亮展示，配合标注和动效",
+  "required_inputs": [
+    "product_image",
+    "feature_text"
+  ],
+  "fills_shot_types": [
+    "product_zoom_in"
+  ],
+  "duration_min_s": 2.0,
+  "duration_max_s": 4.0,
+  "visual_impact_score": 0.76,
+  "tech_stack": [
+    "remotion",
+    "gsap"
+  ]
+}

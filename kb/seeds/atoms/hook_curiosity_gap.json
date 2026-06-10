@@ -1,0 +1,20 @@
+{
+  "atom_id": "hook_curiosity_gap",
+  "type": "shot",
+  "category": "hook",
+  "remotion_component": "CuriosityGap",
+  "description": "悬念式开场，先展示结果再揭示过程",
+  "required_inputs": [
+    "result_image"
+  ],
+  "fills_shot_types": [
+    "hook_attention_grabber"
+  ],
+  "duration_min_s": 1.5,
+  "duration_max_s": 3.5,
+  "visual_impact_score": 0.87,
+  "tech_stack": [
+    "remotion",
+    "ken_burns"
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "template_id": "tpl_9e555f04",
+  "source_videos": [],
+  "category": "家居",
+  "duration_range": [
+    15,
+    25
+  ],
+  "narrative": {
+    "hook_type": "悬念_留白",
+    "build_pattern": "教程演示_步骤拆解",
+    "cta_type": "行动号召"
+  },
+  "timeline": [
+    {
+      "phase": "hook",
+      "duration_pct": [
+        0.15,
+        0.25
+      ],
+      "shot_count_range": [
+        1,
+        2
+      ],
+      "avg_shot_length_s": 3.0,
+      "required_shot_types": [
+        "step_demo",
+        "text_overlay"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFFFFF",
+        "size": "large",
+        "position": "bottom_third",
+        "animation": "typewriter_fast"
+      },
+      "audio_energy": "high",
+      "bgm_role": "节奏带动"
+    },
+    {
+      "phase": "build",
+      "duration_pct": [
+        0.5,
+        0.65
+      ],
+      "shot_count_range": [
+        3,
+        5
+      ],
+      "avg_shot_length_s": 4.0,
+      "required_shot_types": [
+        "text_overlay",
+        "before_after",
+        "step_demo",
+        "hand_gesture",
+        "lifestyle_broll"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFFFFF",
+        "size": "medium",
+        "position": "bottom_third",
+        "animation": "fade_in"
+      },
+      "audio_energy": "medium",
+      "bgm_role": "背景铺垫"
+    },
+    {
+      "phase": "payoff_cta",
+      "duration_pct": [
+        0.15,
+        0.25
+      ],
+      "shot_count_range": [
+        1,
+        2
+      ],
+      "avg_shot_length_s": 3.0,
+      "required_shot_types": [
+        "text_overlay",
+        "step_demo"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFD700",
+        "size": "xlarge",
+        "position": "center",
+        "animation": "scale_up"
+      },
+      "audio_energy": "high",
+      "bgm_role": "高潮推动"
+    }
+  ],
+  "rhythm_profile": {
+    "avg_shot_length_s": 2.5,
+    "shot_length_variance": "high",
+    "energy_curve": "wave"
+  },
+  "cta_type": "行动号召"
+}

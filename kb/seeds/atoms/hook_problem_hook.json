@@ -1,0 +1,20 @@
+{
+  "atom_id": "hook_problem_hook",
+  "type": "caption",
+  "category": "hook",
+  "remotion_component": "ProblemStatement",
+  "description": "痛点问题文字展示，引发用户共鸣",
+  "required_inputs": [
+    "problem_text"
+  ],
+  "fills_shot_types": [
+    "text_overlay"
+  ],
+  "duration_min_s": 2.0,
+  "duration_max_s": 4.0,
+  "visual_impact_score": 0.72,
+  "tech_stack": [
+    "remotion",
+    "gsap"
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "template_id": "tpl_b15edeeb",
+  "source_videos": [
+    "/Users/adrian-us/project/VST/assets/motion_graphics/viral_references/ikea_motion_graphics.mp4"
+  ],
+  "category": "通用",
+  "duration_range": [
+    55.0,
+    65.0
+  ],
+  "narrative": {
+    "hook_type": "利益_直接",
+    "build_pattern": "教程演示_步骤拆解",
+    "cta_type": "社会认同"
+  },
+  "timeline": [
+    {
+      "phase": "hook",
+      "duration_pct": [
+        0.95,
+        1
+      ],
+      "shot_count_range": [
+        1,
+        3
+      ],
+      "avg_shot_length_s": 30.0,
+      "required_shot_types": [
+        "镜头类型"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFFFFF",
+        "size": "large",
+        "position": "bottom_third",
+        "animation": "typewriter_fast"
+      },
+      "audio_energy": "high",
+      "bgm_role": "背景铺垫"
+    }
+  ],
+  "audio_template": {
+    "bpm_range": [
+      74,
+      111
+    ],
+    "beat_align_strength": "medium",
+    "energy_curve": "rising"
+  },
+  "packaging": {
+    "transitions": [
+      "cut"
+    ],
+    "sticker_density_per_sec": 0.0,
+    "title_bar": {
+      "style": "minimal",
+      "appears_at_phases": [
+        "hook"
+      ]
+    },
+    "cover_style": "default",
+    "use_3d_elements": false
+  },
+  "transferability": {
+    "best_for_verticals": [
+      "通用"
+    ],
+    "avoid_verticals": []
+  },
+  "provenance": {
+    "extracted_from": [
+      "/Users/adrian-us/project/VST/assets/motion_graphics/viral_references/ikea_motion_graphics.mp4"
+    ],
+    "extraction_date": "2026-05-23T05:34:13.377060",
+    "version": 1,
+    "times_used": 0
+  }
+}

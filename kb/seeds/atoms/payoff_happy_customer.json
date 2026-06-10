@@ -1,0 +1,19 @@
+{
+  "atom_id": "payoff_happy_customer",
+  "type": "shot",
+  "category": "payoff_cta",
+  "remotion_component": "HappyCustomer",
+  "description": "满意用户镜头，展示使用后的开心状态",
+  "required_inputs": [
+    "customer_video_or_image"
+  ],
+  "fills_shot_types": [
+    "face_closeup"
+  ],
+  "duration_min_s": 2.0,
+  "duration_max_s": 4.0,
+  "visual_impact_score": 0.72,
+  "tech_stack": [
+    "remotion"
+  ]
+}

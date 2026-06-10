@@ -1,0 +1,149 @@
+{
+  "template_id": "tpl_401c4031",
+  "source_videos": [
+    "/Users/adrian-us/project/VST/assets/motion_graphics/viral_references/3d_product_showreel.mp4"
+  ],
+  "category": "通用",
+  "duration_range": [
+    53.0,
+    63.0
+  ],
+  "narrative": {
+    "hook_type": "利益_直接",
+    "build_pattern": "教程演示_步骤拆解",
+    "cta_type": "社会认同"
+  },
+  "timeline": [
+    {
+      "phase": "hook",
+      "duration_pct": [
+        0.12,
+        0.22
+      ],
+      "shot_count_range": [
+        4,
+        6
+      ],
+      "avg_shot_length_s": 2.02,
+      "required_shot_types": [
+        "general"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFFFFF",
+        "size": "large",
+        "position": "bottom_third",
+        "animation": "typewriter_fast"
+      },
+      "audio_energy": "high",
+      "bgm_role": "背景铺垫"
+    },
+    {
+      "phase": "build",
+      "duration_pct": [
+        0.56,
+        0.66
+      ],
+      "shot_count_range": [
+        15,
+        17
+      ],
+      "avg_shot_length_s": 2.2,
+      "required_shot_types": [
+        "general"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFFFFF",
+        "size": "large",
+        "position": "bottom_third",
+        "animation": "typewriter_fast"
+      },
+      "audio_energy": "high",
+      "bgm_role": "节奏推进"
+    },
+    {
+      "phase": "payoff_cta",
+      "duration_pct": [
+        0.17,
+        0.27
+      ],
+      "shot_count_range": [
+        3,
+        5
+      ],
+      "avg_shot_length_s": 3.19,
+      "required_shot_types": [
+        "general"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFFFFF",
+        "size": "large",
+        "position": "bottom_third",
+        "animation": "typewriter_fast"
+      },
+      "audio_energy": "high",
+      "bgm_role": "高潮收尾"
+    }
+  ],
+  "audio_template": {
+    "bpm_range": [
+      69,
+      103
+    ],
+    "beat_align_strength": "medium",
+    "energy_curve": "rising"
+  },
+  "packaging": {
+    "transitions": [
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut"
+    ],
+    "sticker_density_per_sec": 0.0,
+    "title_bar": {
+      "style": "minimal",
+      "appears_at_phases": [
+        "hook"
+      ]
+    },
+    "cover_style": "default",
+    "use_3d_elements": false
+  },
+  "transferability": {
+    "best_for_verticals": [
+      "通用"
+    ],
+    "avoid_verticals": []
+  },
+  "provenance": {
+    "extracted_from": [
+      "/Users/adrian-us/project/VST/assets/motion_graphics/viral_references/3d_product_showreel.mp4"
+    ],
+    "extraction_date": "2026-05-23T05:30:52.867263",
+    "version": 1,
+    "times_used": 0
+  }
+}

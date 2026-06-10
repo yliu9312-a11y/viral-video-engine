@@ -1,0 +1,45 @@
+{
+  "template_id": "tpl_friendship_01",
+  "phases": [
+    {
+      "phase": "hook",
+      "strategy_id": "F",
+      "gap": {
+        "phase": "hook",
+        "missing_shot_types": [
+          "text_overlay"
+        ],
+        "severity": "LOW"
+      },
+      "completion_actions": [],
+      "total_duration_s": 5.85
+    },
+    {
+      "phase": "build",
+      "strategy_id": "F",
+      "gap": {
+        "phase": "build",
+        "missing_shot_types": [
+          "text_overlay",
+          "lifestyle_broll"
+        ],
+        "severity": "LOW"
+      },
+      "completion_actions": [],
+      "total_duration_s": 28.47
+    },
+    {
+      "phase": "payoff_cta",
+      "strategy_id": "F",
+      "gap": {
+        "phase": "payoff_cta",
+        "missing_shot_types": [
+          "text_overlay"
+        ],
+        "severity": "LOW"
+      },
+      "completion_actions": [],
+      "total_duration_s": 4.68
+    }
+  ]
+}

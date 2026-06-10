@@ -1,0 +1,69 @@
+{
+  "shots": [
+    {
+      "id": "hook_bg",
+      "role": "hook",
+      "component": "ParticleBg",
+      "props": {
+        "count": 25,
+        "color": "#FFD60A",
+        "secondaryColor": "#FF416C",
+        "style": "float",
+        "opacity": 0.3
+      },
+      "start": 0,
+      "duration": 116,
+      "position": "center"
+    },
+    {
+      "id": "hook_1",
+      "role": "hook",
+      "component": "KineticText",
+      "props": {
+        "text": "还记得和TA的第一次拥抱吗？",
+        "mode": "bounce",
+        "fontSize": 64,
+        "color": "#FFFFFF",
+        "strokeColor": "#000000",
+        "strokeWidth": 3
+      },
+      "start": 116,
+      "duration": 60,
+      "position": "center"
+    },
+    {
+      "id": "hook_2",
+      "role": "hook",
+      "component": "ProductShowcase",
+      "props": {
+        "productImage": "friend_hug.jpg",
+        "productName": "精选好物",
+        "price": "",
+        "cta": "了解更多"
+      },
+      "start": 176,
+      "duration": 60,
+      "position": "center"
+    },
+    {
+      "id": "hook_3",
+      "role": "hook",
+      "component": "KineticText",
+      "props": {
+        "text": "点击获取你的专属回忆",
+        "mode": "slide",
+        "fontSize": 64,
+        "color": "#FFFFFF",
+        "strokeColor": "#000000",
+        "strokeWidth": 3
+      },
+      "start": 236,
+      "duration": 60,
+      "position": "center"
+    }
+  ],
+  "globalStyle": {
+    "bgColor": "#0A0A0A",
+    "palette": "viral"
+  }
+}

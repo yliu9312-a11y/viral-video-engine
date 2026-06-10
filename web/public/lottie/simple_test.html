@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Lottie 简单测试</title>
+<style>
+body{background:#111;color:#fff;font-family:monospace;padding:20px}
+.row{display:flex;gap:20px;margin:10px 0;align-items:center}
+.box{width:200px;height:200px;background:#222;border:1px solid #333}
+.ok{border-color:#4ecdc4} .ng{border-color:#e94560}
+</style></head><body>
+<h2>Lottie 逐个测试</h2>
+<div id="out"></div>
+<script src="lottie.min.js"></script>
+<script>
+const files = ['checkmark','confetti_burst','adrock','bounce_ball','gatin_cat','happy_2016','particle_explosion','bodymovin_logo'];
+const out = document.getElementById('out');
+
+files.forEach((f, i) => {
+  const row = document.createElement('div');
+  row.className = 'row';
+  
+  const label = document.createElement('div');
+  label.style.width = '180px';
+  label.textContent = f + '.json';
+  row.appendChild(label);
+  
+  const box = document.createElement('div');
+  box.className = 'box';
+  box.id = 'b' + i;
+  row.appendChild(box);
+  
+  const status = document.createElement('span');
+  status.id = 's' + i;
+  status.textContent = '加载中...';
+  row.appendChild(status);
+  
+  out.appendChild(row);
+  
+  // Load with XHR
+  const xhr = new XMLHttpRequest();
+  xhr.open('GET', f + '.json', true);
+  xhr.onload = () => {
+    if (xhr.status !== 200) {
+      status.innerHTML = '<span style="color:#e94560">HTTP ' + xhr.status + '</span>';
+      return;
+    }
+    try {
+      const data = JSON.parse(xhr.responseText);
+      status.textContent = 'JSON OK, 渲染中...';
+      
+      const anim = lottie.loadAnimation({
+        container: box,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        animationData: data,
+      });
+      
+      anim.addEventListener('DOMLoaded', () => {
+        const svg = box.querySelector('svg');
+        if (svg) {
+          box.classList.add('ok');
+          status.innerHTML = '<span style="color:#4ecdc4">✅ SVG 已渲染</span>';
+        } else {
+          box.classList.add('ng');
+          status.innerHTML = '<span style="color:#e94560">❌ 无 SVG</span>';
+        }
+      });
+      
+      anim.addEventListener('data_failed', () => {
+        box.classList.add('ng');
+        status.innerHTML = '<span style="color:#e94560">❌ data_failed</span>';
+      });
+      
+      // Fallback check after 2s
+      setTimeout(() => {
+        const svg = box.querySelector('svg');
+        const canvas = box.querySelector('canvas');
+        if (!svg && !canvas) {
+          box.classList.add('ng');
+          status.innerHTML = '<span style="color:#e94560">❌ 2s 后仍无输出</span>';
+        }
+      }, 2000);
+      
+    } catch(e) {
+      status.innerHTML = '<span style="color:#e94560">❌ ' + e.message + '</span>';
+    }
+  };
+  xhr.send();
+});
+</script></body></html>

@@ -1,0 +1,149 @@
+{
+  "fps": 30,
+  "globalStyle": {
+    "bgColor": "#050510",
+    "palette": "promo"
+  },
+  "shots": [
+    {
+      "id": "premium_hook_0",
+      "role": "hook",
+      "component": "WordReveal",
+      "props": {
+        "text": "你还在为效率低下而烦恼吗？",
+        "color": "#FFFFFF",
+        "delay": 0,
+        "_easing_profile": "premium",
+        "fontSize": 96,
+        "staggerFrames": 3
+      },
+      "start": 0,
+      "duration": 168,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "premium_hook_1",
+      "role": "hook",
+      "component": "GlowTrail",
+      "props": {
+        "color": "#3B82F6",
+        "delay": 0,
+        "_easing_profile": "premium",
+        "trailLength": 5,
+        "dotSize": 6,
+        "pathD": "M 100 960 Q 300 200 540 280 T 980 200"
+      },
+      "start": 168,
+      "duration": 84,
+      "position": "center",
+      "transition": "none"
+    },
+    {
+      "id": "premium_build_2",
+      "role": "build",
+      "component": "ParticleBg",
+      "props": {
+        "color": "#3B82F6",
+        "count": 25,
+        "style": "float",
+        "opacity": 0.3,
+        "_easing_profile": "premium",
+        "secondaryColor": "#FF416C"
+      },
+      "start": 180,
+      "duration": 240,
+      "position": "center",
+      "transition": "none"
+    },
+    {
+      "id": "premium_build_3",
+      "role": "build",
+      "component": "GlassCard",
+      "props": {
+        "text": "AI驱动，智能优化",
+        "width": 280,
+        "height": 200,
+        "float": false,
+        "delay": 0,
+        "_easing_profile": "premium",
+        "glowColor": "#3B82F6"
+      },
+      "start": 420,
+      "duration": 240,
+      "position": "center",
+      "transition": "none"
+    },
+    {
+      "id": "premium_build_4",
+      "role": "build",
+      "component": "GlassCard",
+      "props": {
+        "text": "一键生成，效率倍增",
+        "width": 280,
+        "height": 200,
+        "float": false,
+        "delay": 0,
+        "_easing_profile": "premium",
+        "glowColor": "#3B82F6"
+      },
+      "start": 660,
+      "duration": 240,
+      "position": "center",
+      "transition": "none"
+    },
+    {
+      "id": "premium_build_5",
+      "role": "build",
+      "component": "GlassCard",
+      "props": {
+        "text": "专业模板，即刻上手",
+        "width": 280,
+        "height": 200,
+        "float": false,
+        "delay": 0,
+        "_easing_profile": "premium",
+        "glowColor": "#3B82F6"
+      },
+      "start": 900,
+      "duration": 240,
+      "position": "center",
+      "transition": "none"
+    },
+    {
+      "id": "premium_build_6",
+      "role": "build",
+      "component": "MarqueeText",
+      "props": {
+        "text": "AI创作 · 智能剪辑 · 效率工具 · 专业模板 · 一键生成",
+        "color": "#FFFFFF",
+        "speed": 2,
+        "direction": "left",
+        "_easing_profile": "premium",
+        "fontSize": 28
+      },
+      "start": 1140,
+      "duration": 187,
+      "position": "lower",
+      "transition": "none"
+    },
+    {
+      "id": "premium_payoff_cta_7",
+      "role": "cta",
+      "component": "GradientText",
+      "props": {
+        "text": "立即获取完整方案",
+        "gradient": "linear-gradient(90deg, #9CA3AF, #FFFFFF, #3B82F6)",
+        "delay": 0,
+        "_easing_profile": "premium",
+        "fontSize": 96,
+        "fontWeight": 800,
+        "shimmerSpeed": 0.02
+      },
+      "start": 540,
+      "duration": 168,
+      "position": "center",
+      "transition": "crossfade"
+    }
+  ]
+}

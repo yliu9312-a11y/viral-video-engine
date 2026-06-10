@@ -1,0 +1,129 @@
+{
+  "template_id": "tpl_eed6b8fb",
+  "source_videos": [
+    "/Users/adrian-us/viral-video-engine/e2e_demo/test_video.mp4"
+  ],
+  "category": "通用",
+  "duration_range": [
+    20.0,
+    30.0
+  ],
+  "narrative": {
+    "hook_type": "利益_直接",
+    "build_pattern": "教程演示_步骤拆解",
+    "cta_type": "社会认同"
+  },
+  "timeline": [
+    {
+      "phase": "hook",
+      "duration_pct": [
+        0.15,
+        0.25
+      ],
+      "shot_count_range": [
+        1,
+        2
+      ],
+      "avg_shot_length_s": 5.0,
+      "required_shot_types": [
+        "镜头类型"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFFFFF",
+        "size": "large",
+        "position": "bottom_third",
+        "animation": "typewriter_fast"
+      },
+      "audio_energy": "low",
+      "bgm_role": "背景铺垫"
+    },
+    {
+      "phase": "build",
+      "duration_pct": [
+        0.55,
+        0.65
+      ],
+      "shot_count_range": [
+        2,
+        4
+      ],
+      "avg_shot_length_s": 5.0,
+      "required_shot_types": [
+        "镜头类型"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFFFFF",
+        "size": "large",
+        "position": "bottom_third",
+        "animation": "typewriter_fast"
+      },
+      "audio_energy": "low",
+      "bgm_role": "节奏推进"
+    },
+    {
+      "phase": "payoff_cta",
+      "duration_pct": [
+        0.15,
+        0.25
+      ],
+      "shot_count_range": [
+        1,
+        2
+      ],
+      "avg_shot_length_s": 5.0,
+      "required_shot_types": [
+        "镜头类型"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFFFFF",
+        "size": "large",
+        "position": "bottom_third",
+        "animation": "typewriter_fast"
+      },
+      "audio_energy": "low",
+      "bgm_role": "高潮收尾"
+    }
+  ],
+  "audio_template": {
+    "bpm_range": [
+      96,
+      144
+    ],
+    "beat_align_strength": "medium",
+    "energy_curve": "flat"
+  },
+  "packaging": {
+    "transitions": [
+      "cut",
+      "cut",
+      "cut",
+      "cut"
+    ],
+    "sticker_density_per_sec": 0.0,
+    "title_bar": {
+      "style": "minimal",
+      "appears_at_phases": [
+        "hook"
+      ]
+    },
+    "cover_style": "default",
+    "use_3d_elements": false
+  },
+  "transferability": {
+    "best_for_verticals": [
+      "通用"
+    ],
+    "avoid_verticals": []
+  },
+  "provenance": {
+    "extracted_from": [
+      "/Users/adrian-us/viral-video-engine/e2e_demo/test_video.mp4"
+    ],
+    "extraction_date": "2026-05-23T05:24:36.867071",
+    "version": 1,
+    "times_used": 0
+  }
+}

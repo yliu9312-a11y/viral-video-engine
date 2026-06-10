@@ -1,0 +1,21 @@
+{
+  "atom_id": "payoff_brand_logo",
+  "type": "transition",
+  "category": "payoff_cta",
+  "remotion_component": "BrandLogoOutro",
+  "description": "品牌logo收尾动画，加深品牌印象",
+  "required_inputs": [
+    "logo_image"
+  ],
+  "fills_shot_types": [
+    "transition"
+  ],
+  "duration_min_s": 1.0,
+  "duration_max_s": 2.5,
+  "visual_impact_score": 0.65,
+  "tech_stack": [
+    "remotion",
+    "gsap",
+    "lottie"
+  ]
+}

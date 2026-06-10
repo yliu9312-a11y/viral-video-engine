@@ -1,0 +1,367 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vst://recipe/product-promo/v1",
+  "$comment": "VST Recipe Schema — hand-crafted example. This is the single source of truth for a product promo video. VST's pipeline should auto-generate files matching this structure.",
+
+  "meta": {
+    "templateId": "tpl_product_promo_01",
+    "category": "tech_saas",
+    "fps": 30,
+    "width": 1080,
+    "height": 640,
+    "durationFrames": 1170,
+    "durationSeconds": 39,
+    "codec": "h264",
+    "sourceReference": "Layout.dev promo by Studio Both Sides",
+    "analyzedAt": "2026-05-28"
+  },
+
+  "tokens": {
+    "colors": {
+      "bg": "#050510",
+      "bgGlass": "rgba(15, 23, 42, 0.6)",
+      "bgGlassHeavy": "rgba(15, 23, 42, 0.7)",
+      "accent": "#3B82F6",
+      "accentLight": "#60A5FA",
+      "accentGlow": "rgba(59, 130, 246, 0.3)",
+      "accentGlowSubtle": "rgba(59, 130, 246, 0.15)",
+      "accentGlowBg": "rgba(59, 130, 246, 0.08)",
+      "text": "#FFFFFF",
+      "textMuted": "rgba(255, 255, 255, 0.5)",
+      "textSubtle": "rgba(255, 255, 255, 0.35)",
+      "textBright": "rgba(255, 255, 255, 0.9)",
+      "gradientText": "linear-gradient(90deg, #9CA3AF, #FFFFFF, #3B82F6)",
+      "gradientTextAlt": "linear-gradient(90deg, #6B7280, #FFFFFF, #3B82F6)",
+      "borderGlass": "rgba(59, 130, 246, 0.3)",
+      "borderGlassStrong": "rgba(59, 130, 246, 0.4)",
+      "highlight": "rgba(255, 255, 255, 0.05)",
+      "vignette": "rgba(0, 0, 0, 0.6)"
+    },
+    "glass": {
+      "backdropBlur": "20px",
+      "borderWidth": "1.5px",
+      "borderRadius": 16,
+      "shadowBlur": 30,
+      "shadowSpread": 0
+    },
+    "fonts": {
+      "primary": "SF Pro Display, sans-serif",
+      "mono": "SF Mono, Fira Code, monospace",
+      "hierarchy": {
+        "display":  { "size": 80, "weight": 900, "lineHeight": 1.1 },
+        "headline": { "size": 52, "weight": 800, "lineHeight": 1.2 },
+        "body":     { "size": 22, "weight": 500, "lineHeight": 1.4 },
+        "caption":  { "size": 13, "weight": 400, "lineHeight": 1.4 }
+      }
+    },
+    "spacing": {
+      "cardPadding": 24,
+      "cardGap": 24,
+      "sectionGap": 40,
+      "safeMargin": 40
+    },
+    "shadows": {
+      "float": "0 ${blur}px ${blur * 2}px rgba(0, 0, 0, ${opacity})",
+      "glowBlue": "0 0 ${blur}px rgba(59, 130, 246, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05)",
+      "mockup3d": "0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(59, 130, 246, 0.15)"
+    }
+  },
+
+  "motion": {
+    "wordReveal": {
+      "$comment": "逐词渐变揭示 — 每词 fade+slide 独立",
+      "perWord": ["fadeIn", "translateY(from:+20px,to:0)"],
+      "easing": "expoOut",
+      "easingCurve": [0.16, 1, 0.3, 1],
+      "spring": { "damping": 12, "stiffness": 200, "mass": 0.8, "preset": "snappy" },
+      "durationPerWordFrames": 12,
+      "staggerFrames": 4,
+      "emphasis": { "fontWeight": "400 -> 700", "opacity": "0.6 -> 1.0" }
+    },
+    "typewriter": {
+      "$comment": "打字机逐字出现 + 闪烁光标",
+      "charIntervalFrames": 1,
+      "cursorBlinkInterval": 15,
+      "cursorChar": "|",
+      "containerEntry": { "spring": "heavy", "scale": [0.8, 1] },
+      "barWidthRange": [200, 700],
+      "barHeight": 64,
+      "barBorderRadius": 32
+    },
+    "glowTrail": {
+      "$comment": "发光粒子沿 SVG 路径移动 + 拖尾",
+      "pathD": "M 100,320 Q 300,80 540,100",
+      "particleSize": 5,
+      "trailLength": 6,
+      "trailDecay": { "opacity": [1, 0.15], "scale": [1, 0.4] },
+      "durationFrames": 90,
+      "easing": "smooth",
+      "glowBlur": 4
+    },
+    "floatingMockup": {
+      "$comment": "浮动 UI mockup + 噪声驱动有机微动",
+      "entry": { "type": "staggeredEntrance", "preset": "snappy" },
+      "float": { "type": "noiseOffset", "speed": 0.005, "amplitude": 5 },
+      "tilt": { "rotateY": [0, 5], "rotateX": [0, 2] },
+      "shadowFollow": { "blurRange": [15, 35], "opacityRange": [0.3, 0.15] }
+    },
+    "glassCard": {
+      "$comment": "玻璃拟态卡片入场",
+      "entry": { "spring": { "damping": 15, "stiffness": 100 }, "scale": [0.8, 1] },
+      "stagger": 6,
+      "optionalFloat": { "type": "noiseOffset", "speed": 0.004, "amplitude": 3 }
+    },
+    "marquee": {
+      "$comment": "水平跑马灯文字",
+      "speed": 2.5,
+      "direction": "left",
+      "edgeMask": "linear-gradient(90deg, transparent, black 10%, black 90%, transparent)",
+      "textRepeat": 2
+    },
+    "gradientShimmer": {
+      "$comment": "渐变文字光泽扫描",
+      "backgroundSize": "200% 100%",
+      "shimmerSpeed": 0.02,
+      "shimmerRange": ["-50%", "150%"],
+      "entry": { "spring": "snappy", "translateY": [20, 0] }
+    },
+    "featureGrid": {
+      "$comment": "功能网格交错入场",
+      "layout": { "columns": 2, "gap": 24 },
+      "stagger": 6,
+      "entry": { "type": "staggeredEntrance", "preset": "snappy" }
+    },
+    "logoReveal": {
+      "$comment": "Logo 弹入 + 辉光脉冲",
+      "entry": { "spring": { "damping": 8, "stiffness": 150 }, "scale": [0, 1] },
+      "glow": { "pulse": { "speed": 0.15, "amplitude": 0.1 }, "blurRange": [60, 80] }
+    },
+    "perspectiveTilt": {
+      "$comment": "3D 透视倾斜",
+      "perspective": 1000,
+      "rotateY": [0, 5],
+      "scale": [0.85, 1],
+      "entry": { "spring": "gentle", "delay": 30 }
+    }
+  },
+
+  "components": {
+    "WordReveal":         { "props": ["text", "fontSize", "gradient", "staggerFrames", "delay", "color"] },
+    "GradientText":       { "props": ["text", "fontSize", "fontWeight", "gradient", "delay"] },
+    "TypewriterPrompt":   { "props": ["text", "charInterval", "showCursor", "glowColor", "delay"] },
+    "GlowTrail":          { "props": ["pathD", "color", "delay", "trailLength"] },
+    "GlassCard":          { "props": ["width", "height", "glowColor", "delay", "children"] },
+    "FloatingMockup":     { "props": ["width", "height", "delay", "children"] },
+    "MarqueeText":        { "props": ["text", "speed", "fontSize", "color"] },
+    "FeatureGrid":        { "props": ["features[]", "columns", "delay"] },
+    "LogoReveal":         { "props": ["logoText", "logoIcon", "glowColor"] },
+    "ParticleBg":         { "props": ["count", "color", "secondaryColor", "style", "opacity"] }
+  },
+
+  "timeline": [
+    {
+      "beat": 0,
+      "id": "hook",
+      "label": "Hook — 逐词揭示钩子文案",
+      "startFrame": 0,
+      "durationFrames": 180,
+      "durationSeconds": 6,
+      "components": [
+        { "ref": "WordReveal", "props": {
+          "text": "What if one prompt could build your side hustle?",
+          "fontSize": 48,
+          "gradient": "linear-gradient(90deg, #9CA3AF, #FFFFFF, #3B82F6)",
+          "staggerFrames": 4,
+          "delay": 10
+        }},
+        { "ref": "GlowTrail", "props": {
+          "pathD": "M 100,320 Q 300,80 540,100",
+          "delay": 30
+        }}
+      ],
+      "transition": { "fadeIn": 15, "fadeOut": 0 }
+    },
+    {
+      "beat": 1,
+      "id": "typewriter",
+      "label": "Typewriter — 打字机输入 prompt",
+      "startFrame": 180,
+      "durationFrames": 90,
+      "durationSeconds": 3,
+      "components": [
+        { "ref": "TypewriterPrompt", "props": {
+          "text": "Create a high-end online sneaker marketplace",
+          "charInterval": 1,
+          "delay": 10
+        }}
+      ],
+      "transition": { "fadeIn": 10, "fadeOut": 0 }
+    },
+    {
+      "beat": 2,
+      "id": "features",
+      "label": "Features — 玻璃卡片 + 浮动 mockup + 跑马灯",
+      "startFrame": 270,
+      "durationFrames": 390,
+      "durationSeconds": 13,
+      "phases": [
+        {
+          "label": "Phase 1 — Product cards",
+          "startFrame": 270,
+          "durationFrames": 150,
+          "components": [
+            { "ref": "FloatingMockup", "props": { "width": 260, "height": 200, "delay": 0 }, "children": [
+              { "ref": "GlassCard", "props": { "width": 260, "height": 200, "delay": 0 }, "content": { "icon": "👟", "title": "Nike Air Max", "desc": "Premium collection" }}
+            ]},
+            { "ref": "FloatingMockup", "props": { "width": 260, "height": 200, "delay": 8 }, "children": [
+              { "ref": "GlassCard", "props": { "width": 260, "height": 200, "delay": 8 }, "content": { "icon": "🔥", "title": "Jordan 4 Retro", "desc": "Trending now" }}
+            ]},
+            { "ref": "FloatingMockup", "props": { "width": 260, "height": 200, "delay": 16 }, "children": [
+              { "ref": "GlassCard", "props": { "width": 260, "height": 200, "delay": 16 }, "content": { "icon": "⭐", "title": "Yeezy 350", "desc": "Top rated" }}
+            ]}
+          ]
+        },
+        {
+          "label": "Phase 2 — Analytics cards",
+          "startFrame": 400,
+          "durationFrames": 260,
+          "components": [
+            { "ref": "FloatingMockup", "props": { "width": 260, "height": 200, "delay": 0 }, "children": [
+              { "ref": "GlassCard", "props": { "width": 260, "height": 200, "delay": 0 }, "content": { "icon": "📊", "title": "Analytics", "desc": "Real-time insights" }}
+            ]},
+            { "ref": "FloatingMockup", "props": { "width": 260, "height": 200, "delay": 8 }, "children": [
+              { "ref": "GlassCard", "props": { "width": 260, "height": 200, "delay": 8 }, "content": { "icon": "💳", "title": "Payments", "desc": "Apple Pay / Stripe" }}
+            ]},
+            { "ref": "FloatingMockup", "props": { "width": 260, "height": 200, "delay": 16 }, "children": [
+              { "ref": "GlassCard", "props": { "width": 260, "height": 200, "delay": 16 }, "content": { "icon": "🚀", "title": "Deploy", "desc": "One-click launch" }}
+            ]}
+          ]
+        }
+      ],
+      "marquee": { "ref": "MarqueeText", "props": {
+        "text": "Nike  •  Jordan  •  Yeezy  •  Analytics  •  Payments  •  Deploy  •  Premium",
+        "speed": 2.5,
+        "fontSize": 24,
+        "color": "rgba(255, 255, 255, 0.35)"
+      }},
+      "transition": { "fadeIn": 15, "fadeOut": 15 }
+    },
+    {
+      "beat": 3,
+      "id": "payoff",
+      "label": "Payoff — 渐变大字 + 3D 透视 mockup",
+      "startFrame": 660,
+      "durationFrames": 180,
+      "durationSeconds": 6,
+      "components": [
+        { "ref": "GradientText", "props": {
+          "text": "From prompt to production",
+          "fontSize": 52,
+          "fontWeight": 800,
+          "delay": 5
+        }},
+        { "ref": "PerspectiveMockup", "props": {
+          "width": 600,
+          "height": 340,
+          "perspective": 1000,
+          "rotateY": 5,
+          "delay": 30,
+          "content": { "title": "GRAIL", "subtitle": "Premium Sneaker Marketplace" }
+        }}
+      ],
+      "transition": { "fadeIn": 15, "fadeOut": 15 }
+    },
+    {
+      "beat": 4,
+      "id": "grid",
+      "label": "Feature Grid — 大字标签 + 网格",
+      "startFrame": 840,
+      "durationFrames": 120,
+      "durationSeconds": 4,
+      "components": [
+        { "ref": "FeatureGrid", "props": {
+          "features": [
+            { "label": "Auth", "icon": "🔐", "description": "User authentication" },
+            { "label": "Database", "icon": "🗄️", "description": "Scalable storage" },
+            { "label": "Payments", "icon": "💳", "description": "Stripe + Apple Pay" },
+            { "label": "UI", "icon": "🎨", "description": "Component library" }
+          ],
+          "columns": 2,
+          "delay": 5
+        }}
+      ],
+      "transition": { "fadeIn": 12, "fadeOut": 12 }
+    },
+    {
+      "beat": 5,
+      "id": "closing",
+      "label": "Closing — 渐变滚动文字",
+      "startFrame": 960,
+      "durationFrames": 150,
+      "durationSeconds": 5,
+      "components": [
+        { "ref": "GradientText", "props": {
+          "text": "Stop prompting, start shipping",
+          "fontSize": 48,
+          "fontWeight": 800,
+          "delay": 5,
+          "gradient": "linear-gradient(90deg, #6B7280, #FFFFFF, #3B82F6)"
+        }},
+        { "ref": "MarqueeText", "props": {
+          "text": "Auth  •  Database  •  Payments  •  UI  •  Deploy  •  Scale",
+          "speed": 2,
+          "fontSize": 20,
+          "color": "rgba(255, 255, 255, 0.3)"
+        }}
+      ],
+      "transition": { "fadeIn": 12, "fadeOut": 12 }
+    },
+    {
+      "beat": 6,
+      "id": "logo",
+      "label": "Logo — 品牌收尾",
+      "startFrame": 1110,
+      "durationFrames": 60,
+      "durationSeconds": 2,
+      "components": [
+        { "ref": "LogoReveal", "props": {
+          "logoText": "Layout.dev",
+          "logoIcon": "◆",
+          "glowColor": "#3B82F6"
+        }}
+      ],
+      "transition": { "fadeIn": 8, "fadeOut": 0 }
+    }
+  ],
+
+  "theming": {
+    "$comment": "换题材时只需替换这部分 + timeline 里的 text/icon",
+    "WriteFlow": {
+      "brand": "WriteFlow",
+      "tagline": "AI-Powered Content Studio",
+      "hookText": "What if one prompt could build your content strategy?",
+      "promptText": "Write a compelling product launch email for a new AI-powered writing tool",
+      "payoffText": "From idea to published content",
+      "closingText": "Stop writing, start publishing",
+      "features_phase1": [
+        { "label": "Email", "icon": "✉️", "description": "AI-powered drafts" },
+        { "label": "Blog", "icon": "📝", "description": "Long-form content" },
+        { "label": "Social", "icon": "📱", "description": "Multi-platform posts" }
+      ],
+      "features_phase2": [
+        { "label": "Analytics", "icon": "📊", "description": "Content performance" },
+        { "label": "SEO", "icon": "🔍", "description": "Keyword optimization" },
+        { "label": "Schedule", "icon": "⏰", "description": "Auto-publishing" }
+      ],
+      "gridFeatures": [
+        { "label": "Templates", "icon": "📄", "description": "100+ proven formats" },
+        { "label": "SEO", "icon": "🔍", "description": "Keyword research built-in" },
+        { "label": "Analytics", "icon": "📈", "description": "Track content performance" },
+        { "label": "Scheduling", "icon": "📅", "description": "Auto-publish anywhere" }
+      ],
+      "marquee1": "Email  •  Blog  •  Social  •  Analytics  •  SEO  •  Scheduling  •  Templates  •  AI Writing",
+      "marquee2": "Templates  •  SEO  •  Analytics  •  Scheduling  •  AI Writing  •  Multi-platform",
+      "buttons": ["Draft", "Edit", "Publish"]
+    }
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "template_id": "tpl_6d513ae5",
+  "source_videos": [
+    "/Users/adrian-us/project/VST/assets/motion_graphics/viral_references/app_ui_promo.mp4"
+  ],
+  "category": "通用",
+  "duration_range": [
+    18.0,
+    28.0
+  ],
+  "narrative": {
+    "hook_type": "利益_直接",
+    "build_pattern": "教程演示_步骤拆解",
+    "cta_type": "社会认同"
+  },
+  "timeline": [
+    {
+      "phase": "hook",
+      "duration_pct": [
+        0.76,
+        0.86
+      ],
+      "shot_count_range": [
+        1,
+        2
+      ],
+      "avg_shot_length_s": 18.6,
+      "required_shot_types": [
+        "general"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFFFFF",
+        "size": "large",
+        "position": "bottom_third",
+        "animation": "typewriter_fast"
+      },
+      "audio_energy": "high",
+      "bgm_role": "背景铺垫"
+    },
+    {
+      "phase": "payoff_cta",
+      "duration_pct": [
+        0.14,
+        0.24
+      ],
+      "shot_count_range": [
+        1,
+        2
+      ],
+      "avg_shot_length_s": 4.36,
+      "required_shot_types": [
+        "general"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFFFFF",
+        "size": "large",
+        "position": "bottom_third",
+        "animation": "typewriter_fast"
+      },
+      "audio_energy": "high",
+      "bgm_role": "高潮收尾"
+    }
+  ],
+  "audio_template": {
+    "bpm_range": [
+      90,
+      135
+    ],
+    "beat_align_strength": "medium",
+    "energy_curve": "rising"
+  },
+  "packaging": {
+    "transitions": [
+      "cut"
+    ],
+    "sticker_density_per_sec": 0.0,
+    "title_bar": {
+      "style": "minimal",
+      "appears_at_phases": [
+        "hook"
+      ]
+    },
+    "cover_style": "default",
+    "use_3d_elements": false
+  },
+  "transferability": {
+    "best_for_verticals": [
+      "通用"
+    ],
+    "avoid_verticals": []
+  },
+  "provenance": {
+    "extracted_from": [
+      "/Users/adrian-us/project/VST/assets/motion_graphics/viral_references/app_ui_promo.mp4"
+    ],
+    "extraction_date": "2026-05-23T05:33:32.446089",
+    "version": 1,
+    "times_used": 0
+  }
+}

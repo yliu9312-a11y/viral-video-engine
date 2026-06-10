@@ -1,0 +1,21 @@
+{
+  "atom_id": "build_tutorial_step",
+  "type": "shot",
+  "category": "build",
+  "remotion_component": "TutorialStep",
+  "description": "教程步骤展示，分步骤演示操作过程",
+  "required_inputs": [
+    "step_video_or_image",
+    "step_number"
+  ],
+  "fills_shot_types": [
+    "usage_scenario"
+  ],
+  "duration_min_s": 2.5,
+  "duration_max_s": 5.0,
+  "visual_impact_score": 0.74,
+  "tech_stack": [
+    "remotion",
+    "gsap"
+  ]
+}

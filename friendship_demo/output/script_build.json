@@ -1,0 +1,69 @@
+{
+  "shots": [
+    {
+      "id": "build_bg",
+      "role": "build",
+      "component": "ParticleBg",
+      "props": {
+        "count": 25,
+        "color": "#FFD60A",
+        "secondaryColor": "#FF416C",
+        "style": "float",
+        "opacity": 0.3
+      },
+      "start": 0,
+      "duration": 240,
+      "position": "center"
+    },
+    {
+      "id": "build_1",
+      "role": "build",
+      "component": "KineticText",
+      "props": {
+        "text": "还记得上次和老友开怀大笑是什么时候？",
+        "mode": "bounce",
+        "fontSize": 64,
+        "color": "#FFFFFF",
+        "strokeColor": "#000000",
+        "strokeWidth": 3
+      },
+      "start": 240,
+      "duration": 240,
+      "position": "center"
+    },
+    {
+      "id": "build_2",
+      "role": "build",
+      "component": "ProductShowcase",
+      "props": {
+        "productImage": "friend_hug.jpg",
+        "productName": "系列产品",
+        "price": "",
+        "cta": "了解更多"
+      },
+      "start": 480,
+      "duration": 198,
+      "position": "center"
+    },
+    {
+      "id": "build_3",
+      "role": "build",
+      "component": "KineticText",
+      "props": {
+        "text": "每一次相聚，都值得被珍藏和分享。",
+        "mode": "slide",
+        "fontSize": 64,
+        "color": "#FFFFFF",
+        "strokeColor": "#000000",
+        "strokeWidth": 3
+      },
+      "start": 678,
+      "duration": 240,
+      "position": "center"
+    }
+  ],
+  "globalStyle": {
+    "bgColor": "#0A0A0A",
+    "palette": "viral"
+  }
+}

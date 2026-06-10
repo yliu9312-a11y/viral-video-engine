@@ -1,0 +1,78 @@
+{
+  "template_id": "tpl_e4d16146",
+  "source_videos": [
+    "/Users/adrian-us/project/VST/assets/motion_graphics/viral_references/saas_product_demo.mp4"
+  ],
+  "category": "通用",
+  "duration_range": [
+    14.0,
+    24.0
+  ],
+  "narrative": {
+    "hook_type": "利益_直接",
+    "build_pattern": "教程演示_步骤拆解",
+    "cta_type": "社会认同"
+  },
+  "timeline": [
+    {
+      "phase": "hook",
+      "duration_pct": [
+        0.95,
+        1
+      ],
+      "shot_count_range": [
+        1,
+        2
+      ],
+      "avg_shot_length_s": 19.03,
+      "required_shot_types": [
+        "镜头类型"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFFFFF",
+        "size": "large",
+        "position": "bottom_third",
+        "animation": "typewriter_fast"
+      },
+      "audio_energy": "medium_rising",
+      "bgm_role": "背景铺垫"
+    }
+  ],
+  "audio_template": {
+    "bpm_range": [
+      98,
+      148
+    ],
+    "beat_align_strength": "medium",
+    "energy_curve": "rising"
+  },
+  "packaging": {
+    "transitions": [
+      "cut"
+    ],
+    "sticker_density_per_sec": 0.0,
+    "title_bar": {
+      "style": "minimal",
+      "appears_at_phases": [
+        "hook"
+      ]
+    },
+    "cover_style": "default",
+    "use_3d_elements": false
+  },
+  "transferability": {
+    "best_for_verticals": [
+      "通用"
+    ],
+    "avoid_verticals": []
+  },
+  "provenance": {
+    "extracted_from": [
+      "/Users/adrian-us/project/VST/assets/motion_graphics/viral_references/saas_product_demo.mp4"
+    ],
+    "extraction_date": "2026-05-23T05:39:52.638063",
+    "version": 1,
+    "times_used": 0
+  }
+}

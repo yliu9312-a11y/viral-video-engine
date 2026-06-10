@@ -1,0 +1,13 @@
+{
+  "atom_id": "promo_logo_reveal",
+  "type": "shot",
+  "category": "cta",
+  "remotion_component": "LogoReveal",
+  "description": "Logo spring 弹入 + 蓝色辉光脉冲, 品牌收尾",
+  "required_inputs": ["logo_text", "logo_icon"],
+  "fills_shot_types": ["logo_reveal"],
+  "duration_min_s": 1.5,
+  "duration_max_s": 3.0,
+  "visual_impact_score": 0.9,
+  "tech_stack": ["remotion", "spring", "glow"]
+}

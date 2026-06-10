@@ -1,0 +1,20 @@
+{
+  "atom_id": "hook_before_after",
+  "type": "shot",
+  "category": "hook",
+  "remotion_component": "BeforeAfterSplit",
+  "description": "左右对比分屏，使用前vs使用后效果展示",
+  "required_inputs": [
+    "before_image",
+    "after_image"
+  ],
+  "fills_shot_types": [
+    "before_after"
+  ],
+  "duration_min_s": 2.0,
+  "duration_max_s": 4.0,
+  "visual_impact_score": 0.88,
+  "tech_stack": [
+    "remotion"
+  ]
+}

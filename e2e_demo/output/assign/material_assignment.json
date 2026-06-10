@@ -1,0 +1,105 @@
+{
+  "template_id": "tpl_eed6b8fb",
+  "generated_at": "2026-05-23T05:25:25.144444",
+  "phases": [
+    {
+      "phase": "hook",
+      "strategy_id": "B",
+      "strategy_name": "字幕补全",
+      "materials": [
+        {
+          "path": "/Users/adrian-us/viral-video-engine/e2e_demo/materials/product_camera.jpg",
+          "type": "image",
+          "role": "fill",
+          "duration_s": 3.0
+        },
+        {
+          "path": "/Users/adrian-us/viral-video-engine/e2e_demo/materials/product_headphones.jpg",
+          "type": "image",
+          "role": "fill",
+          "duration_s": 3.0
+        }
+      ],
+      "completion_actions": [],
+      "total_duration_s": 3.0,
+      "kb_atoms": []
+    },
+    {
+      "phase": "build",
+      "strategy_id": "E",
+      "strategy_name": "素材重组",
+      "materials": [
+        {
+          "path": "/Users/adrian-us/viral-video-engine/e2e_demo/materials/product_camera.jpg",
+          "type": "image",
+          "role": "fill",
+          "duration_s": 3.0
+        },
+        {
+          "path": "/Users/adrian-us/viral-video-engine/e2e_demo/materials/product_headphones.jpg",
+          "type": "image",
+          "role": "fill",
+          "duration_s": 3.0
+        },
+        {
+          "path": "/Users/adrian-us/viral-video-engine/e2e_demo/materials/product_shoe.jpg",
+          "type": "image",
+          "role": "fill",
+          "duration_s": 3.0
+        },
+        {
+          "path": "/Users/adrian-us/viral-video-engine/e2e_demo/materials/product_watch.jpg",
+          "type": "image",
+          "role": "fill",
+          "duration_s": 3.0
+        }
+      ],
+      "completion_actions": [
+        {
+          "action_type": "material_transform",
+          "component": "TransformedClip",
+          "params": {
+            "source": "/Users/adrian-us/viral-video-engine/e2e_demo/materials/product_camera.jpg",
+            "transform": "ken_burns_zoom_in"
+          },
+          "duration_s": 3.0
+        },
+        {
+          "action_type": "material_transform",
+          "component": "TransformedClip",
+          "params": {
+            "source": "/Users/adrian-us/viral-video-engine/e2e_demo/materials/product_headphones.jpg",
+            "transform": "ken_burns_pan"
+          },
+          "duration_s": 3.0
+        }
+      ],
+      "total_duration_s": 2.999999999999999,
+      "kb_atoms": []
+    },
+    {
+      "phase": "payoff_cta",
+      "strategy_id": "B",
+      "strategy_name": "字幕补全",
+      "materials": [
+        {
+          "path": "/Users/adrian-us/viral-video-engine/e2e_demo/materials/product_camera.jpg",
+          "type": "image",
+          "role": "fill",
+          "duration_s": 3.0
+        },
+        {
+          "path": "/Users/adrian-us/viral-video-engine/e2e_demo/materials/product_headphones.jpg",
+          "type": "image",
+          "role": "fill",
+          "duration_s": 3.0
+        }
+      ],
+      "completion_actions": [],
+      "total_duration_s": 3.0,
+      "kb_atoms": []
+    }
+  ],
+  "total_duration_s": 9.0,
+  "warnings": []
+}

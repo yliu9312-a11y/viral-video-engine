@@ -1,0 +1,31 @@
+{
+  "module_id": "mod_build_compare",
+  "phase": "build",
+  "narrative_pattern": "对比展示",
+  "script_template": "使用前{痛点} vs 使用后{效果}",
+  "duration_min_s": 5.0,
+  "duration_max_s": 10.0,
+  "description": "对比式内容构建，用视觉差异证明效果",
+  "atoms": [
+    {
+      "atom_id": "build_comparison",
+      "weight": 0.35,
+      "optional": false
+    },
+    {
+      "atom_id": "build_product_zoom",
+      "weight": 0.25,
+      "optional": false
+    },
+    {
+      "atom_id": "build_usage_scenario",
+      "weight": 0.25,
+      "optional": false
+    },
+    {
+      "atom_id": "build_data_graphic",
+      "weight": 0.15,
+      "optional": true
+    }
+  ]
+}

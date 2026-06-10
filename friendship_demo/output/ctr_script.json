@@ -1,0 +1,179 @@
+{
+  "fps": 30,
+  "globalStyle": {
+    "bgColor": "#050510",
+    "palette": "promo"
+  },
+  "shots": [
+    {
+      "id": "ctr_hook_0",
+      "role": "hook",
+      "component": "WordReveal",
+      "props": {
+        "text": "你还在手动剪视频吗？",
+        "color": "#FFFFFF",
+        "delay": 0,
+        "_easing_profile": "snappy",
+        "fontSize": 96,
+        "staggerFrames": 3
+      },
+      "start": 0,
+      "duration": 81,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "ctr_hook_1",
+      "role": "hook",
+      "component": "GlowTrail",
+      "props": {
+        "color": "#3B82F6",
+        "delay": 0,
+        "_easing_profile": "snappy",
+        "trailLength": 5,
+        "dotSize": 6,
+        "pathD": "M 100 960 Q 300 200 540 280 T 980 200"
+      },
+      "start": 81,
+      "duration": 60,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "ctr_build_2",
+      "role": "build",
+      "component": "ParticleBg",
+      "props": {
+        "color": "#3B82F6",
+        "count": 25,
+        "style": "float",
+        "opacity": 0.3,
+        "_easing_profile": "snappy",
+        "secondaryColor": "#FF416C"
+      },
+      "start": 180,
+      "duration": 192,
+      "position": "center",
+      "transition": "none"
+    },
+    {
+      "id": "ctr_build_3",
+      "role": "build",
+      "component": "FloatingMockup",
+      "props": {
+        "text": "",
+        "width": 300,
+        "height": 200,
+        "perspective": 1000,
+        "delay": 0,
+        "_easing_profile": "snappy",
+        "floatSpeed": 0.02,
+        "rotateY": 5.0
+      },
+      "start": 372,
+      "duration": 144,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "ctr_build_4",
+      "role": "build",
+      "component": "GlassCard",
+      "props": {
+        "text": "智能算法，精准解决你的核心痛点",
+        "width": 280,
+        "height": 200,
+        "float": false,
+        "delay": 0,
+        "_easing_profile": "snappy",
+        "glowColor": "#3B82F6"
+      },
+      "start": 516,
+      "duration": 144,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "ctr_build_5",
+      "role": "build",
+      "component": "FeatureGrid",
+      "props": {
+        "features": [
+          {
+            "label": "一键生成"
+          },
+          {
+            "label": "多场景适配"
+          },
+          {
+            "label": "实时预览"
+          },
+          {
+            "label": "云端同步"
+          }
+        ],
+        "columns": 2,
+        "delay": 0,
+        "_easing_profile": "snappy",
+        "cardWidth": 280,
+        "cardHeight": 180
+      },
+      "start": 660,
+      "duration": 144,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "ctr_build_6",
+      "role": "build",
+      "component": "MarqueeText",
+      "props": {
+        "text": "高效 · 智能 · 专业 · 未来已来",
+        "color": "#FFFFFF",
+        "speed": 2,
+        "direction": "left",
+        "_easing_profile": "snappy",
+        "fontSize": 28
+      },
+      "start": 804,
+      "duration": 107,
+      "position": "lower",
+      "transition": "none"
+    },
+    {
+      "id": "ctr_payoff_cta_7",
+      "role": "cta",
+      "component": "GradientText",
+      "props": {
+        "text": "立即行动，开启你的蜕变之旅",
+        "delay": 0,
+        "_easing_profile": "snappy",
+        "fontSize": 64,
+        "fontWeight": 800,
+        "shimmerSpeed": 0.02
+      },
+      "start": 540,
+      "duration": 72,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "ctr_payoff_cta_8",
+      "role": "cta",
+      "component": "KineticText",
+      "props": {
+        "text": "点击下方链接，获取专属方案",
+        "color": "#FFFFFF",
+        "mode": "bounce",
+        "_easing_profile": "snappy",
+        "fontSize": 40,
+        "strokeColor": "#000000",
+        "strokeWidth": 3
+      },
+      "start": 612,
+      "duration": 48,
+      "position": "lower",
+      "transition": "crossfade"
+    }
+  ]
+}

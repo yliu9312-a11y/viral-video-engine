@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>渲染器测试</title>
+<style>
+body{font-family:monospace;background:#111;color:#e0e0e0;padding:20px}
+.row{display:flex;align-items:center;gap:12px;margin:8px 0;padding:8px;background:#1a1a2e;border-radius:8px}
+.box{width:120px;height:120px;background:#222;border-radius:4px;flex-shrink:0}
+.pass{color:#4ecdc4} .fail{color:#e94560}
+</style></head><body>
+<h2>SVG vs Canvas 渲染器对比</h2>
+<div id="out"></div>
+<script src="lottie.min.js"></script>
+<script>
+const files = ["checkmark","confetti_burst","adrock","bodymovin_logo","bounce_ball",
+  "gatin_cat","happy_2016","lightning_bolt","navidad","particle_explosion"];
+const out = document.getElementById('out');
+
+files.forEach(f => {
+  const xhr = new XMLHttpRequest();
+  xhr.open('GET', f + '.json', true);
+  xhr.onload = function() {
+    const data = JSON.parse(xhr.responseText);
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `<b style="width:160px">${f}</b>`;
+    
+    // Try SVG
+    const svgBox = document.createElement('div');
+    svgBox.className = 'box';
+    row.appendChild(svgBox);
+    const svgLabel = document.createElement('span');
+    svgLabel.textContent = 'SVG: ';
+    row.appendChild(svgLabel);
+    
+    try {
+      const svgAnim = lottie.loadAnimation({
+        container: svgBox, renderer: 'svg', loop: false, autoplay: false, animationData: data
+      });
+      setTimeout(() => {
+        const svg = svgBox.querySelector('svg');
+        const elems = svgBox.querySelectorAll('path,circle,rect,ellipse,image,g');
+        if (svg && elems.length > 0) {
+          svgLabel.innerHTML = `<span class="pass">SVG ✅ ${elems.length} 元素</span>`;
+        } else {
+          svgLabel.innerHTML = `<span class="fail">SVG ❌ 空</span>`;
+        }
+        svgAnim.destroy();
+      }, 200);
+    } catch(e) {
+      svgLabel.innerHTML = `<span class="fail">SVG ❌ ${e.message}</span>`;
+    }
+    
+    // Try Canvas
+    const canvasBox = document.createElement('div');
+    canvasBox.className = 'box';
+    row.appendChild(canvasBox);
+    const canvasLabel = document.createElement('span');
+    canvasLabel.textContent = 'Canvas: ';
+    row.appendChild(canvasLabel);
+    
+    try {
+      const canvasAnim = lottie.loadAnimation({
+        container: canvasBox, renderer: 'canvas', loop: false, autoplay: false, animationData: data
+      });
+      setTimeout(() => {
+        const canvas = canvasBox.querySelector('canvas');
+        if (canvas) {
+          // Check if canvas has any non-transparent pixels
+          const ctx = canvas.getContext('2d');
+          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const nonEmpty = imgData.data.some((v, i) => i % 4 === 3 && v > 0);
+          if (nonEmpty) {
+            canvasLabel.innerHTML = `<span class="pass">Canvas ✅</span>`;
+          } else {
+            canvasLabel.innerHTML = `<span class="fail">Canvas ❌ 空</span>`;
+          }
+        } else {
+          canvasLabel.innerHTML = `<span class="fail">Canvas ❌ 无 canvas</span>`;
+        }
+        canvasAnim.destroy();
+      }, 200);
+    } catch(e) {
+      canvasLabel.innerHTML = `<span class="fail">Canvas ❌ ${e.message}</span>`;
+    }
+    
+    out.appendChild(row);
+  };
+  xhr.send();
+});
+</script></body></html>

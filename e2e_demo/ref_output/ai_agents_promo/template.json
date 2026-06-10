@@ -1,0 +1,135 @@
+{
+  "template_id": "tpl_0baaec7e",
+  "source_videos": [
+    "/Users/adrian-us/project/VST/assets/motion_graphics/viral_references/ai_agents_promo.mp4"
+  ],
+  "category": "通用",
+  "duration_range": [
+    37.0,
+    47.0
+  ],
+  "narrative": {
+    "hook_type": "利益_直接",
+    "build_pattern": "教程演示_步骤拆解",
+    "cta_type": "社会认同"
+  },
+  "timeline": [
+    {
+      "phase": "hook",
+      "duration_pct": [
+        0.12,
+        0.22
+      ],
+      "shot_count_range": [
+        2,
+        4
+      ],
+      "avg_shot_length_s": 2.42,
+      "required_shot_types": [
+        "镜头类型"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFFFFF",
+        "size": "large",
+        "position": "bottom_third",
+        "animation": "typewriter_fast"
+      },
+      "audio_energy": "high",
+      "bgm_role": "背景铺垫"
+    },
+    {
+      "phase": "build",
+      "duration_pct": [
+        0.69,
+        0.79
+      ],
+      "shot_count_range": [
+        6,
+        8
+      ],
+      "avg_shot_length_s": 4.45,
+      "required_shot_types": [
+        "镜头类型"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFFFFF",
+        "size": "large",
+        "position": "bottom_third",
+        "animation": "typewriter_fast"
+      },
+      "audio_energy": "high",
+      "bgm_role": "节奏推进"
+    },
+    {
+      "phase": "payoff_cta",
+      "duration_pct": [
+        0.04,
+        0.14
+      ],
+      "shot_count_range": [
+        1,
+        2
+      ],
+      "avg_shot_length_s": 3.63,
+      "required_shot_types": [
+        "镜头类型"
+      ],
+      "caption_style": {
+        "font": "思源黑体",
+        "color": "#FFFFFF",
+        "size": "large",
+        "position": "bottom_third",
+        "animation": "typewriter_fast"
+      },
+      "audio_energy": "high",
+      "bgm_role": "高潮收尾"
+    }
+  ],
+  "audio_template": {
+    "bpm_range": [
+      80,
+      119
+    ],
+    "beat_align_strength": "medium",
+    "energy_curve": "rising"
+  },
+  "packaging": {
+    "transitions": [
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut",
+      "cut"
+    ],
+    "sticker_density_per_sec": 0.0,
+    "title_bar": {
+      "style": "minimal",
+      "appears_at_phases": [
+        "hook"
+      ]
+    },
+    "cover_style": "default",
+    "use_3d_elements": false
+  },
+  "transferability": {
+    "best_for_verticals": [
+      "通用"
+    ],
+    "avoid_verticals": []
+  },
+  "provenance": {
+    "extracted_from": [
+      "/Users/adrian-us/project/VST/assets/motion_graphics/viral_references/ai_agents_promo.mp4"
+    ],
+    "extraction_date": "2026-05-23T05:33:02.133895",
+    "version": 1,
+    "times_used": 0
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "vst-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "./scripts/start.sh dev",
+    "install:all": "npm install && cd services/node && npm install && cd ../remotion && npm install && cd ../../web && npm install",
+    "test:smoke": "node scripts/smoke-test.js"
+  }
+}

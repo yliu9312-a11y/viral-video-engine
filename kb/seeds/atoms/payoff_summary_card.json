@@ -1,0 +1,21 @@
+{
+  "atom_id": "payoff_summary_card",
+  "type": "caption",
+  "category": "payoff_cta",
+  "remotion_component": "SummaryCard",
+  "description": "总结卡片，回顾核心卖点+CTA组合",
+  "required_inputs": [
+    "summary_points",
+    "cta_text"
+  ],
+  "fills_shot_types": [
+    "text_overlay"
+  ],
+  "duration_min_s": 2.5,
+  "duration_max_s": 5.0,
+  "visual_impact_score": 0.78,
+  "tech_stack": [
+    "remotion",
+    "gsap"
+  ]
+}

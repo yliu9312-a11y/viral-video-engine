@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Build
+dist/
+build/
+.next/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude local
+.claude/
+CLAUDE.local.md
+.agents/
+
+# Media assets (large files)
+assets/raw/
+assets/generated/
+output/videos/
+*.mp4
+*.mov
+*.avi
+!assets/samples/*.mp4
+
+# Models
+models/
+*.bin
+*.safetensors
+
+# Logs
+*.log
+logs/
+
+# Redis dump
+dump.rdb
+
+# Runtime data (contains API logs, generated files, user uploads)
+data/
+*.pkl
+
+# Generated code
+web/src/components/mg/_generated_component_map.ts

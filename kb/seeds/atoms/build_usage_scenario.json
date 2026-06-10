@@ -1,0 +1,20 @@
+{
+  "atom_id": "build_usage_scenario",
+  "type": "shot",
+  "category": "build",
+  "remotion_component": "UsageScenarioFrame",
+  "description": "使用场景展示，真实环境中展示产品使用过程",
+  "required_inputs": [
+    "usage_video_or_image"
+  ],
+  "fills_shot_types": [
+    "usage_scenario"
+  ],
+  "duration_min_s": 3.0,
+  "duration_max_s": 6.0,
+  "visual_impact_score": 0.82,
+  "tech_stack": [
+    "remotion",
+    "ken_burns"
+  ]
+}

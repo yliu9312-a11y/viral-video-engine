@@ -1,0 +1,13 @@
+{
+  "atom_id": "promo_typewriter_prompt",
+  "type": "shot",
+  "category": "hook",
+  "remotion_component": "TypewriterPrompt",
+  "description": "圆角玻璃拟态搜索栏 + 打字机输入 + 闪烁光标 + 发光边框",
+  "required_inputs": ["prompt_text"],
+  "fills_shot_types": ["typewriter_prompt"],
+  "duration_min_s": 2.0,
+  "duration_max_s": 5.0,
+  "visual_impact_score": 0.9,
+  "tech_stack": ["remotion", "glassmorphism", "glow_trail"]
+}

@@ -1,0 +1,119 @@
+{
+  "template_id": "tpl_friendship_01",
+  "material_count": 5,
+  "materials": [
+    {
+      "path": "friendship_demo/materials/friend_hand.jpg",
+      "type": "image",
+      "tagged_types": [
+        "general"
+      ],
+      "duration": 3.0,
+      "description": ""
+    },
+    {
+      "path": "friendship_demo/materials/friend_hug.jpg",
+      "type": "image",
+      "tagged_types": [
+        "general"
+      ],
+      "duration": 3.0,
+      "description": ""
+    },
+    {
+      "path": "friendship_demo/materials/friend_laugh.jpg",
+      "type": "image",
+      "tagged_types": [
+        "general"
+      ],
+      "duration": 3.0,
+      "description": "一张温暖的户外人像照片，捕捉了一对情侣在夕阳下开怀大笑的亲密瞬间，氛围温馨。"
+    },
+    {
+      "path": "friendship_demo/materials/friend_logo.jpg",
+      "type": "image",
+      "tagged_types": [
+        "text_overlay"
+      ],
+      "duration": 3.0,
+      "description": "橙色渐变抽象图形，描绘两个人形相拥，象征合作、关爱或社群连接。"
+    },
+    {
+      "path": "friendship_demo/materials/friend_memories.jpg",
+      "type": "image",
+      "tagged_types": [
+        "general"
+      ],
+      "duration": 3.0,
+      "description": "以怀旧色调呈现的友情与冒险主题照片拼贴。"
+    }
+  ],
+  "gaps": [
+    {
+      "phase": "hook",
+      "missing_shot_types": [],
+      "duration_shortfall": 5.8,
+      "shot_count_shortfall": 0,
+      "low_quality_count": 0,
+      "severity": "MEDIUM",
+      "impact_on_video": "",
+      "recommended_strategies": [
+        {
+          "id": "B",
+          "name": "字幕补全",
+          "description": "加大字幕信息密度，用文字承载缺失画面的语义",
+          "priority": 5
+        }
+      ]
+    },
+    {
+      "phase": "build",
+      "missing_shot_types": [
+        "lifestyle_broll",
+        "reaction_shot"
+      ],
+      "duration_shortfall": 26.92,
+      "shot_count_shortfall": 3,
+      "low_quality_count": 0,
+      "severity": "HIGH",
+      "impact_on_video": "缺少lifestyle_broll、reaction_shot，会让中段展示环节的表现力下降，预估完播率受影响。",
+      "recommended_strategies": [
+        {
+          "id": "E",
+          "name": "素材重组",
+          "description": "对现有素材做 Ken Burns、变速、反向、裁剪等变换复用",
+          "priority": 4
+        },
+        {
+          "id": "B",
+          "name": "字幕补全",
+          "description": "加大字幕信息密度，用文字承载缺失画面的语义",
+          "priority": 5
+        }
+      ]
+    },
+    {
+      "phase": "payoff_cta",
+      "missing_shot_types": [],
+      "duration_shortfall": 2.28,
+      "shot_count_shortfall": 0,
+      "low_quality_count": 0,
+      "severity": "LOW",
+      "impact_on_video": "",
+      "recommended_strategies": [
+        {
+          "id": "B",
+          "name": "字幕补全",
+          "description": "加大字幕信息密度，用文字承载缺失画面的语义",
+          "priority": 5
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_gaps": 3,
+    "high_severity": 1,
+    "medium_severity": 1,
+    "low_severity": 1
+  }
+}

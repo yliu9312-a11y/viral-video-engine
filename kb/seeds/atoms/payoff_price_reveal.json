@@ -1,0 +1,21 @@
+{
+  "atom_id": "payoff_price_reveal",
+  "type": "caption",
+  "category": "payoff_cta",
+  "remotion_component": "PriceReveal",
+  "description": "价格揭示动效，原价划掉+现价突出显示",
+  "required_inputs": [
+    "original_price",
+    "sale_price"
+  ],
+  "fills_shot_types": [
+    "text_overlay"
+  ],
+  "duration_min_s": 1.5,
+  "duration_max_s": 3.5,
+  "visual_impact_score": 0.82,
+  "tech_stack": [
+    "remotion",
+    "gsap"
+  ]
+}

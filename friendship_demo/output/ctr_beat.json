@@ -1,0 +1,227 @@
+{
+  "fps": 30,
+  "globalStyle": {
+    "bgColor": "#050510",
+    "palette": "promo"
+  },
+  "shots": [
+    {
+      "id": "beat_hook_0",
+      "role": "hook",
+      "component": "WordReveal",
+      "props": {
+        "text": "Who is your 3 AM friend?",
+        "gradient": "linear-gradient(90deg, #9CA3AF, #FFFFFF, #3B82F6)",
+        "color": "#FFFFFF",
+        "delay": 0,
+        "fontSize": 64,
+        "staggerFrames": 4
+      },
+      "start": 0,
+      "duration": 144,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "beat_hook_1",
+      "role": "hook",
+      "component": "GlowTrail",
+      "props": {
+        "color": "#3B82F6",
+        "delay": 30,
+        "trailLength": 5,
+        "dotSize": 6,
+        "pathD": "M 100,800 Q 300,200 540,300"
+      },
+      "start": 0,
+      "duration": 144,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "beat_hook_2",
+      "role": "hook",
+      "component": "TypewriterPrompt",
+      "props": {
+        "text": "Remember laughing until...",
+        "delay": 10,
+        "charInterval": 1,
+        "showCursor": true,
+        "glowColor": "#3B82F6"
+      },
+      "start": 144,
+      "duration": 96,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "beat_build_3",
+      "role": "build",
+      "component": "GlassCard",
+      "props": {
+        "text": "😂 开怀大笑\n笑到停不下来的瞬间",
+        "width": 260,
+        "height": 200,
+        "float": true,
+        "delay": 0,
+        "glowColor": "rgba(59, 130, 246, 0.3)"
+      },
+      "start": 240,
+      "duration": 240,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "beat_build_4",
+      "role": "build",
+      "component": "GlassCard",
+      "props": {
+        "text": "🤝 并肩同行\n低谷时伸出的手",
+        "width": 260,
+        "height": 200,
+        "float": true,
+        "delay": 0,
+        "glowColor": "rgba(59, 130, 246, 0.3)"
+      },
+      "start": 240,
+      "duration": 240,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "beat_build_5",
+      "role": "build",
+      "component": "GlassCard",
+      "props": {
+        "text": "🌅 共同回忆\n一起看过的风景",
+        "width": 260,
+        "height": 200,
+        "float": true,
+        "delay": 0,
+        "glowColor": "rgba(59, 130, 246, 0.3)"
+      },
+      "start": 240,
+      "duration": 240,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "beat_build_6",
+      "role": "build",
+      "component": "MarqueeText",
+      "props": {
+        "text": "Bond • Laughter • Support • Memories • Forever",
+        "speed": 2.5,
+        "color": "rgba(255, 255, 255, 0.35)",
+        "direction": "left",
+        "fontSize": 28
+      },
+      "start": 240,
+      "duration": 240,
+      "position": "lower",
+      "transition": "crossfade"
+    },
+    {
+      "id": "beat_build_7",
+      "role": "build",
+      "component": "GradientText",
+      "props": {
+        "text": "From strangers to soulmates.",
+        "gradient": "linear-gradient(90deg, #9CA3AF, #FFFFFF, #3B82F6)",
+        "delay": 0,
+        "fontSize": 64,
+        "fontWeight": 800,
+        "shimmerSpeed": 0.02
+      },
+      "start": 480,
+      "duration": 120,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "beat_build_8",
+      "role": "build",
+      "component": "FeatureGrid",
+      "props": {
+        "features": [
+          {
+            "label": "Trust",
+            "icon": "🛡️",
+            "description": "无条件信任"
+          },
+          {
+            "label": "Loyalty",
+            "icon": "💎",
+            "description": "始终如一"
+          },
+          {
+            "label": "Growth",
+            "icon": "🌱",
+            "description": "共同成长"
+          },
+          {
+            "label": "Joy",
+            "icon": "✨",
+            "description": "快乐加倍"
+          }
+        ],
+        "columns": 2,
+        "delay": 0,
+        "cardWidth": 280,
+        "cardHeight": 180
+      },
+      "start": 600,
+      "duration": 96,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "beat_cta_9",
+      "role": "cta",
+      "component": "GradientText",
+      "props": {
+        "text": "Tag your soul friend.",
+        "gradient": "linear-gradient(90deg, #6B7280, #FFFFFF, #3B82F6)",
+        "delay": 0,
+        "fontSize": 64,
+        "fontWeight": 800,
+        "shimmerSpeed": 0.02
+      },
+      "start": 696,
+      "duration": 120,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "beat_cta_10",
+      "role": "cta",
+      "component": "MarqueeText",
+      "props": {
+        "text": "Connection • Community • Real Friends",
+        "speed": 2,
+        "color": "rgba(255, 255, 255, 0.35)",
+        "direction": "left",
+        "fontSize": 28
+      },
+      "start": 696,
+      "duration": 120,
+      "position": "lower",
+      "transition": "crossfade"
+    },
+    {
+      "id": "beat_cta_11",
+      "role": "cta",
+      "component": "LogoReveal",
+      "props": {
+        "delay": 0,
+        "glowColor": "#3B82F6",
+        "logoText": "FriendSpace",
+        "logoIcon": "💛"
+      },
+      "start": 816,
+      "duration": 48,
+      "position": "center",
+      "transition": "crossfade"
+    }
+  ]
+}

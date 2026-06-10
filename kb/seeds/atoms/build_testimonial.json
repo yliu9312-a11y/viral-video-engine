@@ -1,0 +1,19 @@
+{
+  "atom_id": "build_testimonial",
+  "type": "shot",
+  "category": "build",
+  "remotion_component": "TestimonialFrame",
+  "description": "用户证言镜头，真实用户分享使用体验",
+  "required_inputs": [
+    "testimonial_video"
+  ],
+  "fills_shot_types": [
+    "face_closeup"
+  ],
+  "duration_min_s": 3.0,
+  "duration_max_s": 6.0,
+  "visual_impact_score": 0.8,
+  "tech_stack": [
+    "remotion"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "atom_id": "build_process_montage",
+  "type": "shot",
+  "category": "build",
+  "remotion_component": "ProcessMontage",
+  "description": "过程蒙太奇，多镜头快剪展示完整使用流程",
+  "required_inputs": [
+    "process_videos"
+  ],
+  "fills_shot_types": [
+    "usage_scenario"
+  ],
+  "duration_min_s": 3.0,
+  "duration_max_s": 7.0,
+  "visual_impact_score": 0.78,
+  "tech_stack": [
+    "remotion"
+  ]
+}

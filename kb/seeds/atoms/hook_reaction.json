@@ -1,0 +1,19 @@
+{
+  "atom_id": "hook_reaction",
+  "type": "shot",
+  "category": "hook",
+  "remotion_component": "ReactionShot",
+  "description": "夸张反应镜头，展示使用后的惊喜表情",
+  "required_inputs": [
+    "reaction_video"
+  ],
+  "fills_shot_types": [
+    "face_closeup"
+  ],
+  "duration_min_s": 1.0,
+  "duration_max_s": 3.0,
+  "visual_impact_score": 0.82,
+  "tech_stack": [
+    "remotion"
+  ]
+}

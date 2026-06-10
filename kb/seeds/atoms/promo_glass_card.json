@@ -1,0 +1,13 @@
+{
+  "atom_id": "promo_glass_card",
+  "type": "shot",
+  "category": "build",
+  "remotion_component": "GlassCard",
+  "description": "玻璃拟态卡片容器, 蓝色边框辉光, 可选浮动动画",
+  "required_inputs": ["card_content"],
+  "fills_shot_types": ["glass_card", "floating_mockup"],
+  "duration_min_s": 2.0,
+  "duration_max_s": 5.0,
+  "visual_impact_score": 0.8,
+  "tech_stack": ["remotion", "glassmorphism", "noise"]
+}

@@ -1,0 +1,31 @@
+{
+  "template_id": "tpl_product_promo_01",
+  "category": "科技/SaaS",
+  "hook_type": "悬念_反问句",
+  "build_pattern": "功能展示_网格布局",
+  "cta_type": "品牌收尾",
+  "duration_min": 35,
+  "duration_max": 40,
+  "target_verticals": ["数码", "科技", "好物推荐"],
+  "description": "SaaS/科技产品宣传片: 悬疑hook → 打字机prompt输入 → 玻璃拟态功能展示 → 渐变大字payoff → 功能网格 → 收尾文案 → logo弹入",
+  "timeline": [
+    {"phase": "hook", "duration_pct": 0.154, "required_shot_types": ["word_reveal", "glow_trail"]},
+    {"phase": "typewriter", "duration_pct": 0.077, "required_shot_types": ["typewriter_prompt"]},
+    {"phase": "build", "duration_pct": 0.333, "required_shot_types": ["glass_card", "floating_mockup", "marquee_text"]},
+    {"phase": "payoff", "duration_pct": 0.154, "required_shot_types": ["gradient_text", "perspective_mockup"]},
+    {"phase": "grid", "duration_pct": 0.103, "required_shot_types": ["feature_grid"]},
+    {"phase": "closing", "duration_pct": 0.128, "required_shot_types": ["gradient_text", "marquee_text"]},
+    {"phase": "logo", "duration_pct": 0.051, "required_shot_types": ["logo_reveal"]}
+  ],
+  "canvas": {"width": 1080, "height": 640, "fps": 30},
+  "design_tokens": {
+    "bg_primary": "#050510",
+    "accent_primary": "#3B82F6",
+    "accent_light": "#60A5FA",
+    "text_primary": "#FFFFFF",
+    "text_secondary": "#6B7280",
+    "glass_bg": "rgba(15, 23, 42, 0.6)",
+    "glass_border": "rgba(59, 130, 246, 0.3)",
+    "glass_blur": 20
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "module_id": "mod_hook_question",
+  "phase": "hook",
+  "narrative_pattern": "痛点反问句",
+  "script_template": "你知道{痛点}吗？99%的人都不知道{解决方案}",
+  "duration_min_s": 3.0,
+  "duration_max_s": 6.0,
+  "description": "痛点反问式开场，用问题引发共鸣",
+  "atoms": [
+    {
+      "atom_id": "hook_face_closeup",
+      "weight": 0.4,
+      "optional": false
+    },
+    {
+      "atom_id": "hook_problem_hook",
+      "weight": 0.35,
+      "optional": false
+    },
+    {
+      "atom_id": "hook_transition_in",
+      "weight": 0.25,
+      "optional": true
+    }
+  ]
+}

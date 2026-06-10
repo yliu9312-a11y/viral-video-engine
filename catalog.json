@@ -1,0 +1,1997 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "description": "统一组件目录 — 单一真相源。所有组件注册从此文件自动生成。",
+    "sources": [
+      "mg_library",
+      "remocn",
+      "parametric",
+      "codegen"
+    ]
+  },
+  "components": [
+    {
+      "id": "kinetic_text",
+      "source": "mg_library",
+      "render_component": "KineticText",
+      "import_path": "../../components/mg/KineticText",
+      "status": "implemented",
+      "kind": "text",
+      "description": "动感文字(bounce/slide/typewriter/shake)，用于标题/卖点/CTA",
+      "when_to_use": "标题入场、hook文字、卖点强调、CTA号召",
+      "when_not": "短标语(<=4字)用char_pop；正文优先可读性用WordReveal",
+      "props_schema": {
+        "text": {
+          "type": "str",
+          "required": true,
+          "max_chars": 20
+        },
+        "mode": {
+          "type": "str",
+          "default": "bounce",
+          "enum": [
+            "bounce",
+            "slide",
+            "typewriter",
+            "shake"
+          ]
+        },
+        "font_size": {
+          "type": "str",
+          "default": "headline",
+          "enum": [
+            "display",
+            "headline",
+            "body",
+            "caption"
+          ]
+        },
+        "color": {
+          "type": "str",
+          "default": "#FFFFFF"
+        },
+        "stroke_color": {
+          "type": "str",
+          "default": "#000000"
+        },
+        "stroke_width": {
+          "type": "int",
+          "default": 3,
+          "range": [
+            0,
+            10
+          ]
+        }
+      },
+      "defaults": {
+        "text": "默认文字",
+        "mode": "bounce",
+        "fontSize": 64,
+        "color": "#FFFFFF",
+        "strokeColor": "#000000",
+        "strokeWidth": 3
+      },
+      "char_limits": {
+        "max_chars": 20,
+        "max_words": 4,
+        "note": "动感文字, 大字"
+      },
+      "phases": [
+        "hook",
+        "build",
+        "cta"
+      ],
+      "roles": [
+        "hero_text",
+        "decorative"
+      ],
+      "tags": [
+        "text",
+        "animated",
+        "stagger",
+        "spring"
+      ],
+      "validation": {
+        "requires_text": true,
+        "is_card": false,
+        "is_bg": false,
+        "is_choreography": false,
+        "must_read": true
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [
+        "TitleBar",
+        "FaceCloseupFrame",
+        "ReactionFrame",
+        "HandGestureFrame",
+        "GenericFrame"
+      ],
+      "visual_impact_score": 0.8,
+      "duration_range_s": [
+        2,
+        8
+      ],
+      "example_effect": "文字从底部弹入，带弹性回弹效果，适合开场大标题"
+    },
+    {
+      "id": "product_showcase",
+      "source": "mg_library",
+      "render_component": "ProductShowcase",
+      "import_path": "../../components/mg/ProductShowcase",
+      "status": "implemented",
+      "kind": "composition",
+      "description": "产品展示卡片(图片+价格+CTA)，用于产品特写",
+      "when_to_use": "产品展示、商品特写、需要图片+文字+价格的场景",
+      "when_not": "纯文字场景用KineticText；数据展示用BarChart",
+      "props_schema": {
+        "product_image": {
+          "type": "str",
+          "default": ""
+        },
+        "product_name": {
+          "type": "str",
+          "required": true,
+          "max_chars": 10
+        },
+        "price": {
+          "type": "str",
+          "default": ""
+        },
+        "cta": {
+          "type": "str",
+          "default": "了解更多",
+          "max_chars": 6
+        }
+      },
+      "defaults": {
+        "productImage": "",
+        "productName": "精选好物",
+        "price": "",
+        "cta": "了解更多"
+      },
+      "char_limits": null,
+      "phases": [
+        "build"
+      ],
+      "roles": [
+        "content_cards"
+      ],
+      "tags": [
+        "card",
+        "image",
+        "price"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": true,
+        "is_bg": false,
+        "is_choreography": false,
+        "must_read": false
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [
+        "ProductZoomFrame",
+        "ProductShowcase"
+      ],
+      "visual_impact_score": 0.7,
+      "duration_range_s": [
+        3,
+        8
+      ],
+      "example_effect": "产品图片居中，价格从右侧滑入，CTA按钮最后弹出"
+    },
+    {
+      "id": "countdown_timer",
+      "source": "mg_library",
+      "render_component": "CountdownTimer",
+      "import_path": "../../components/mg/CountdownTimer",
+      "status": "implemented",
+      "kind": "effect",
+      "description": "3-2-1-GO倒计时，用于开场紧迫感",
+      "when_to_use": "hook开场、限时促销、制造紧迫感",
+      "when_not": "cta结尾用PriceReveal；build阶段不合适",
+      "props_schema": {
+        "countdown": {
+          "type": "int",
+          "default": 3,
+          "range": [
+            1,
+            5
+          ]
+        },
+        "color": {
+          "type": "str",
+          "default": "#FF416C"
+        },
+        "go_text": {
+          "type": "str",
+          "default": "GO!"
+        }
+      },
+      "defaults": {
+        "countdown": 3,
+        "color": "#FF416C",
+        "goText": "GO!"
+      },
+      "char_limits": null,
+      "phases": [
+        "hook"
+      ],
+      "roles": [
+        "decorative"
+      ],
+      "tags": [
+        "animation",
+        "urgency",
+        "countdown"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": false,
+        "is_bg": false,
+        "is_choreography": false,
+        "must_read": false
+      },
+      "phase_blacklist": [
+        "cta"
+      ],
+      "kb_atom_names": [
+        "AttentionGrabber",
+        "hook_attention_grabber",
+        "CountdownTimer"
+      ],
+      "visual_impact_score": 0.9,
+      "duration_range_s": [
+        1,
+        4
+      ],
+      "example_effect": "3-2-1数字逐个放大缩小，最后GO!爆裂特效"
+    },
+    {
+      "id": "price_reveal",
+      "source": "mg_library",
+      "render_component": "PriceReveal",
+      "import_path": "../../components/mg/PriceReveal",
+      "status": "implemented",
+      "kind": "composition",
+      "description": "价格揭示(原价划掉→现价弹出)，用于限时优惠",
+      "when_to_use": "cta价格展示、限时优惠、促销收尾",
+      "when_not": "hook开场不合适；纯文字用KineticText",
+      "props_schema": {
+        "original_price": {
+          "type": "str",
+          "required": true
+        },
+        "current_price": {
+          "type": "str",
+          "required": true
+        },
+        "badge": {
+          "type": "str",
+          "default": "限时特价",
+          "max_chars": 6
+        },
+        "color": {
+          "type": "str",
+          "default": "#FF416C"
+        }
+      },
+      "defaults": {
+        "originalPrice": "¥199",
+        "currentPrice": "¥39.9",
+        "badge": "限时特价",
+        "color": "#FF416C"
+      },
+      "char_limits": null,
+      "phases": [
+        "cta"
+      ],
+      "roles": [
+        "content_cards"
+      ],
+      "tags": [
+        "price",
+        "promotion",
+        "reveal"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": false,
+        "is_bg": false,
+        "is_choreography": false,
+        "must_read": false
+      },
+      "phase_blacklist": [
+        "hook"
+      ],
+      "kb_atom_names": [
+        "CTAOverlay",
+        "PriceReveal"
+      ],
+      "visual_impact_score": 0.85,
+      "duration_range_s": [
+        2,
+        6
+      ],
+      "example_effect": "原价划线淡出，现价从下方弹入，限时角标闪烁"
+    },
+    {
+      "id": "before_after",
+      "source": "mg_library",
+      "render_component": "BeforeAfter",
+      "import_path": "../../components/mg/BeforeAfter",
+      "status": "implemented",
+      "kind": "composition",
+      "description": "前后对比分屏，用于效果对比",
+      "when_to_use": "效果对比、使用前后、产品对比",
+      "when_not": "单图展示用FloatingMockup；数据对比用BarChart",
+      "props_schema": {
+        "before_image": {
+          "type": "str",
+          "default": ""
+        },
+        "after_image": {
+          "type": "str",
+          "default": ""
+        },
+        "before_label": {
+          "type": "str",
+          "default": "Before",
+          "max_chars": 6
+        },
+        "after_label": {
+          "type": "str",
+          "default": "After",
+          "max_chars": 6
+        }
+      },
+      "defaults": {
+        "beforeImage": "",
+        "afterImage": "",
+        "beforeLabel": "Before",
+        "afterLabel": "After"
+      },
+      "char_limits": null,
+      "phases": [
+        "build"
+      ],
+      "roles": [
+        "content_cards"
+      ],
+      "tags": [
+        "comparison",
+        "split",
+        "image"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": true,
+        "is_bg": false,
+        "is_choreography": false,
+        "must_read": false
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [
+        "UsageDemoFrame",
+        "ComparisonDemo",
+        "BeforeAfterSplit"
+      ],
+      "visual_impact_score": 0.75,
+      "duration_range_s": [
+        3,
+        8
+      ],
+      "example_effect": "左侧before图淡出，右侧after图淡入，中间分割线滑动"
+    },
+    {
+      "id": "bar_chart",
+      "source": "mg_library",
+      "render_component": "BarChart",
+      "import_path": "../../components/mg/DataChart",
+      "status": "implemented",
+      "kind": "composition",
+      "description": "柱状图动画，用于数据展示/参数对比",
+      "when_to_use": "数据对比、参数展示、评分比较",
+      "when_not": "数字滚动用NumberRoll；环形占比用DonutChart",
+      "props_schema": {
+        "data": {
+          "type": "list",
+          "required": true,
+          "min_length": 1,
+          "max_length": 6
+        }
+      },
+      "defaults": {
+        "data": [
+          {
+            "label": "效果",
+            "value": 85
+          },
+          {
+            "label": "性价比",
+            "value": 92
+          }
+        ]
+      },
+      "char_limits": null,
+      "phases": [
+        "build"
+      ],
+      "roles": [
+        "content_cards"
+      ],
+      "tags": [
+        "data",
+        "chart",
+        "comparison"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": true,
+        "is_bg": false,
+        "is_choreography": false,
+        "must_read": false
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [
+        "DataGraphic",
+        "ScreenRecordFrame"
+      ],
+      "visual_impact_score": 0.7,
+      "duration_range_s": [
+        3,
+        8
+      ],
+      "example_effect": "柱状图从底部逐根长出，带数字标签弹入"
+    },
+    {
+      "id": "number_roll",
+      "source": "mg_library",
+      "render_component": "NumberRoll",
+      "import_path": "../../components/mg/DataChart",
+      "status": "implemented",
+      "kind": "text",
+      "description": "数字滚动到目标值，用于销量/粉丝数",
+      "when_to_use": "数字冲击、销量展示、粉丝数、数据hook",
+      "when_not": "复杂数据用BarChart；纯文字用KineticText",
+      "props_schema": {
+        "value": {
+          "type": "int",
+          "required": true
+        },
+        "prefix": {
+          "type": "str",
+          "default": ""
+        },
+        "suffix": {
+          "type": "str",
+          "default": "+"
+        },
+        "color": {
+          "type": "str",
+          "default": "#FFD700"
+        },
+        "font_size": {
+          "type": "str",
+          "default": "display"
+        }
+      },
+      "defaults": {
+        "value": 10000,
+        "prefix": "",
+        "suffix": "+",
+        "color": "#FFD700",
+        "fontSize": 96
+      },
+      "char_limits": null,
+      "phases": [
+        "hook",
+        "build"
+      ],
+      "roles": [
+        "hero_text"
+      ],
+      "tags": [
+        "data",
+        "number",
+        "animation"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": false,
+        "is_bg": false,
+        "is_choreography": false,
+        "must_read": false
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [
+        "NumberRoll"
+      ],
+      "visual_impact_score": 0.8,
+      "duration_range_s": [
+        2,
+        5
+      ],
+      "example_effect": "数字从0快速滚动到目标值，带金色光晕"
+    },
+    {
+      "id": "donut_chart",
+      "source": "mg_library",
+      "render_component": "DonutChart",
+      "import_path": "../../components/mg/DataChart",
+      "status": "implemented",
+      "kind": "composition",
+      "description": "环形图动画，用于占比/好评率展示",
+      "when_to_use": "占比展示、好评率、市场份额",
+      "when_not": "柱状对比用BarChart；数字滚动用NumberRoll",
+      "props_schema": {
+        "segments": {
+          "type": "list",
+          "required": true,
+          "min_length": 1,
+          "max_length": 6
+        }
+      },
+      "defaults": {
+        "segments": [
+          {
+            "label": "好评",
+            "value": 95,
+            "color": "#00d68f"
+          },
+          {
+            "label": "其他",
+            "value": 5,
+            "color": "#333"
+          }
+        ]
+      },
+      "char_limits": null,
+      "phases": [
+        "build"
+      ],
+      "roles": [
+        "content_cards"
+      ],
+      "tags": [
+        "data",
+        "chart",
+        "percentage"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": true,
+        "is_bg": false,
+        "is_choreography": false,
+        "must_read": false
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [],
+      "visual_impact_score": 0.65,
+      "duration_range_s": [
+        3,
+        6
+      ],
+      "example_effect": "环形图逐段填充，百分比标签依次弹入"
+    },
+    {
+      "id": "particle_bg",
+      "source": "mg_library",
+      "render_component": "ParticleBg",
+      "import_path": "../../components/mg/ParticleBg",
+      "status": "implemented",
+      "kind": "background",
+      "description": "粒子背景(float/burst/drift/stars)，用于氛围",
+      "when_to_use": "背景氛围层、所有阶段可选装饰",
+      "when_not": "不要遮挡前景内容；纯色背景用BackgroundLayer",
+      "props_schema": {
+        "count": {
+          "type": "int",
+          "default": 25,
+          "range": [
+            5,
+            100
+          ]
+        },
+        "color": {
+          "type": "str",
+          "default": "#FFD60A"
+        },
+        "secondary_color": {
+          "type": "str",
+          "default": "#FF416C"
+        },
+        "style": {
+          "type": "str",
+          "default": "float",
+          "enum": [
+            "float",
+            "burst",
+            "drift",
+            "stars"
+          ]
+        },
+        "opacity": {
+          "type": "float",
+          "default": 0.3,
+          "range": [
+            0.0,
+            1.0
+          ]
+        }
+      },
+      "defaults": {
+        "count": 25,
+        "color": "#FFD60A",
+        "secondaryColor": "#FF416C",
+        "style": "float",
+        "opacity": 0.3
+      },
+      "char_limits": null,
+      "phases": [
+        "hook",
+        "build",
+        "cta"
+      ],
+      "roles": [
+        "background"
+      ],
+      "tags": [
+        "background",
+        "particles",
+        "atmosphere"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": false,
+        "is_bg": true,
+        "is_choreography": true,
+        "must_read": false
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [
+        "LifestyleFrame",
+        "BrollFrame",
+        "StickerPack"
+      ],
+      "visual_impact_score": 0.4,
+      "duration_range_s": [
+        0,
+        60
+      ],
+      "example_effect": "粒子从四周飘入，缓慢浮动，营造氛围"
+    },
+    {
+      "id": "gradient_text",
+      "source": "mg_library",
+      "render_component": "GradientText",
+      "import_path": "../../components/mg/GradientText",
+      "status": "implemented",
+      "kind": "text",
+      "description": "渐变文字+shimmer光效，适合大标题、品牌slogan。自带spring入场+shimmer循环",
+      "when_to_use": "大标题、品牌slogan、cta收尾文字、hook大字",
+      "when_not": "短标语(<=4字)用char_pop；逐词揭示用WordReveal",
+      "props_schema": {
+        "text": {
+          "type": "str",
+          "required": true,
+          "max_chars": 35
+        },
+        "gradient": {
+          "type": "str",
+          "default": "linear-gradient(90deg, #9CA3AF, #FFFFFF, #3B82F6)"
+        },
+        "font_size": {
+          "type": "str",
+          "default": "headline"
+        },
+        "font_weight": {
+          "type": "int",
+          "default": 800,
+          "range": [
+            100,
+            900
+          ]
+        },
+        "shimmer_speed": {
+          "type": "float",
+          "default": 0.02,
+          "range": [
+            0.005,
+            0.1
+          ]
+        },
+        "delay": {
+          "type": "int",
+          "default": 0,
+          "range": [
+            0,
+            300
+          ]
+        }
+      },
+      "defaults": {
+        "text": "默认渐变文字",
+        "fontSize": 64,
+        "fontWeight": 800,
+        "shimmerSpeed": 0.02
+      },
+      "char_limits": {
+        "max_chars": 35,
+        "max_words": 6,
+        "note": "渐变大字, 单行, 64px"
+      },
+      "phases": [
+        "hook",
+        "cta"
+      ],
+      "roles": [
+        "hero_text"
+      ],
+      "tags": [
+        "text",
+        "gradient",
+        "shimmer",
+        "spring"
+      ],
+      "validation": {
+        "requires_text": true,
+        "is_card": false,
+        "is_bg": false,
+        "is_choreography": false,
+        "must_read": true
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [],
+      "visual_impact_score": 0.85,
+      "duration_range_s": [
+        2,
+        8
+      ],
+      "example_effect": "渐变色大字从模糊变清晰，shimmer光效循环扫过"
+    },
+    {
+      "id": "word_reveal",
+      "source": "mg_library",
+      "render_component": "WordReveal",
+      "import_path": "../../components/mg/WordReveal",
+      "status": "implemented",
+      "kind": "text",
+      "description": "逐词交错fade+slide揭示，适合英文hook、金句、标语。自带stagger动效",
+      "when_to_use": "标题入场、hook文字、品牌slogan、英文金句",
+      "when_not": "短标语(<=4字)用char_pop；中文标题用mask_reveal",
+      "props_schema": {
+        "text": {
+          "type": "str",
+          "required": true,
+          "max_chars": 50
+        },
+        "font_size": {
+          "type": "str",
+          "default": "display"
+        },
+        "color": {
+          "type": "str",
+          "default": "#FFFFFF"
+        },
+        "gradient": {
+          "type": "str",
+          "default": "linear-gradient(90deg, #9CA3AF, #FFFFFF, #3B82F6)"
+        },
+        "stagger_frames": {
+          "type": "int",
+          "default": 3,
+          "range": [
+            1,
+            10
+          ]
+        },
+        "delay": {
+          "type": "int",
+          "default": 0,
+          "range": [
+            0,
+            300
+          ]
+        }
+      },
+      "defaults": {
+        "text": "Default Word Reveal",
+        "fontSize": 96,
+        "color": "#FFFFFF",
+        "staggerFrames": 3
+      },
+      "char_limits": {
+        "max_chars": 50,
+        "max_words": 8,
+        "note": "逐词揭示, 大字, 可 wrap"
+      },
+      "phases": [
+        "hook",
+        "cta"
+      ],
+      "roles": [
+        "hero_text"
+      ],
+      "tags": [
+        "text",
+        "animated",
+        "stagger",
+        "spring"
+      ],
+      "validation": {
+        "requires_text": true,
+        "is_card": false,
+        "is_bg": false,
+        "is_choreography": false,
+        "must_read": true
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [
+        "TitleBar"
+      ],
+      "visual_impact_score": 0.85,
+      "duration_range_s": [
+        2,
+        8
+      ],
+      "example_effect": "每个词依次fade+slide入场，交错节奏感强"
+    },
+    {
+      "id": "typewriter_prompt",
+      "source": "mg_library",
+      "render_component": "TypewriterPrompt",
+      "import_path": "../../components/mg/TypewriterPrompt",
+      "status": "implemented",
+      "kind": "text",
+      "description": "圆角搜索栏+打字机输入+光标闪烁+发光边框，适合展示AI prompt、代码、指令",
+      "when_to_use": "搜索栏展示、AI prompt、代码片段、指令输入",
+      "when_not": "普通标题用WordReveal/GradientText",
+      "props_schema": {
+        "text": {
+          "type": "str",
+          "required": true,
+          "max_chars": 25
+        },
+        "char_interval": {
+          "type": "int",
+          "default": 1,
+          "range": [
+            1,
+            5
+          ]
+        },
+        "show_cursor": {
+          "type": "bool",
+          "default": true
+        },
+        "glow_color": {
+          "type": "str",
+          "default": "#3B82F6"
+        },
+        "delay": {
+          "type": "int",
+          "default": 0,
+          "range": [
+            0,
+            300
+          ]
+        }
+      },
+      "defaults": {
+        "text": "echo 'hello world'",
+        "charInterval": 1,
+        "showCursor": true,
+        "glowColor": "#3B82F6"
+      },
+      "char_limits": {
+        "max_chars": 25,
+        "max_words": 5,
+        "note": "搜索栏 700px, 单行 nowrap"
+      },
+      "phases": [
+        "hook"
+      ],
+      "roles": [
+        "hero_text"
+      ],
+      "tags": [
+        "text",
+        "typewriter",
+        "search",
+        "code"
+      ],
+      "validation": {
+        "requires_text": true,
+        "is_card": false,
+        "is_bg": false,
+        "is_choreography": false,
+        "must_read": true
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [],
+      "visual_impact_score": 0.75,
+      "duration_range_s": [
+        2,
+        6
+      ],
+      "example_effect": "搜索栏从无到有，文字逐字打出，光标闪烁"
+    },
+    {
+      "id": "glass_card",
+      "source": "mg_library",
+      "render_component": "GlassCard",
+      "import_path": "../../components/mg/GlassCard",
+      "status": "implemented",
+      "kind": "composition",
+      "description": "玻璃拟态容器(blur+蓝色边框发光+可选浮动)，适合功能卡片、特性展示",
+      "when_to_use": "功能卡片、特性展示、玻璃拟态风格",
+      "when_not": "纯文字用KineticText；网格布局用FeatureGrid",
+      "props_schema": {
+        "text": {
+          "type": "str",
+          "default": "",
+          "max_chars": 20
+        },
+        "width": {
+          "type": "int",
+          "default": 280,
+          "range": [
+            100,
+            800
+          ]
+        },
+        "height": {
+          "type": "int",
+          "default": 200,
+          "range": [
+            80,
+            600
+          ]
+        },
+        "glow_color": {
+          "type": "str",
+          "default": "rgba(59, 130, 246, 0.3)"
+        },
+        "float": {
+          "type": "bool",
+          "default": false
+        },
+        "delay": {
+          "type": "int",
+          "default": 0,
+          "range": [
+            0,
+            300
+          ]
+        }
+      },
+      "defaults": {
+        "text": "特性展示",
+        "width": 280,
+        "height": 200,
+        "glowColor": "rgba(59, 130, 246, 0.3)",
+        "float": false
+      },
+      "char_limits": {
+        "max_chars": 20,
+        "max_words": 4,
+        "note": "卡片 260px, 内部文字"
+      },
+      "phases": [
+        "build"
+      ],
+      "roles": [
+        "content_cards"
+      ],
+      "tags": [
+        "card",
+        "glass",
+        "frosted"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": true,
+        "is_bg": false,
+        "is_choreography": false,
+        "must_read": false
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [
+        "FeatureHighlight"
+      ],
+      "visual_impact_score": 0.7,
+      "duration_range_s": [
+        3,
+        8
+      ],
+      "example_effect": "毛玻璃卡片从透明渐显，蓝色边框发光，可选浮动"
+    },
+    {
+      "id": "floating_mockup",
+      "source": "mg_library",
+      "render_component": "FloatingMockup",
+      "import_path": "../../components/mg/FloatingMockup",
+      "status": "implemented",
+      "kind": "composition",
+      "description": "浮动UI截图+透视倾斜+跟随阴影，适合展示app/网站界面截图",
+      "when_to_use": "app截图展示、UI界面、产品界面预览",
+      "when_not": "纯文字展示用KineticText；对比用BeforeAfter",
+      "props_schema": {
+        "text": {
+          "type": "str",
+          "default": ""
+        },
+        "src": {
+          "type": "str",
+          "default": ""
+        },
+        "width": {
+          "type": "int",
+          "default": 300,
+          "range": [
+            100,
+            800
+          ]
+        },
+        "height": {
+          "type": "int",
+          "default": 200,
+          "range": [
+            80,
+            600
+          ]
+        },
+        "float_speed": {
+          "type": "float",
+          "default": 0.02,
+          "range": [
+            0.005,
+            0.1
+          ]
+        },
+        "perspective": {
+          "type": "int",
+          "default": 1000,
+          "range": [
+            200,
+            3000
+          ]
+        },
+        "rotate_y": {
+          "type": "float",
+          "default": 5.0,
+          "range": [
+            0.0,
+            30.0
+          ]
+        },
+        "delay": {
+          "type": "int",
+          "default": 0,
+          "range": [
+            0,
+            300
+          ]
+        }
+      },
+      "defaults": {
+        "text": "App Preview",
+        "width": 300,
+        "height": 200,
+        "floatSpeed": 0.02,
+        "rotateY": 5
+      },
+      "char_limits": null,
+      "phases": [
+        "build"
+      ],
+      "roles": [
+        "content_cards"
+      ],
+      "tags": [
+        "card",
+        "mockup",
+        "image",
+        "float"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": true,
+        "is_bg": false,
+        "is_choreography": true,
+        "must_read": false
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [],
+      "visual_impact_score": 0.7,
+      "duration_range_s": [
+        3,
+        10
+      ],
+      "example_effect": "UI截图带透视倾斜，缓慢浮动，跟随阴影变化"
+    },
+    {
+      "id": "marquee_text",
+      "source": "mg_library",
+      "render_component": "MarqueeText",
+      "import_path": "../../components/mg/MarqueeText",
+      "status": "implemented",
+      "kind": "text",
+      "description": "水平滚动文字+边缘渐变遮罩，适合底部信息流、标签列表、品牌关键词",
+      "when_to_use": "底部标签流、关键词滚动、品牌信息、底部ticker",
+      "when_not": "主标题用WordReveal/GradientText；需要静止文字用KineticText",
+      "props_schema": {
+        "text": {
+          "type": "str",
+          "required": true,
+          "max_chars": 80
+        },
+        "speed": {
+          "type": "float",
+          "default": 3.3,
+          "range": [
+            0.5,
+            10.0
+          ]
+        },
+        "font_size": {
+          "type": "str",
+          "default": "caption"
+        },
+        "color": {
+          "type": "str",
+          "default": "rgba(255, 255, 255, 0.35)"
+        },
+        "direction": {
+          "type": "str",
+          "default": "left",
+          "enum": [
+            "left",
+            "right"
+          ]
+        }
+      },
+      "defaults": {
+        "text": "关键词 • 标签 • 品牌",
+        "speed": 3.3,
+        "fontSize": 32,
+        "color": "rgba(255, 255, 255, 0.35)",
+        "direction": "left"
+      },
+      "char_limits": {
+        "max_chars": 80,
+        "max_words": 15,
+        "note": "跑马灯, 滚动显示, 长度不限但要可读"
+      },
+      "phases": [
+        "build",
+        "cta"
+      ],
+      "roles": [
+        "bottom_ticker",
+        "decorative"
+      ],
+      "tags": [
+        "text",
+        "scroll",
+        "marquee",
+        "ticker"
+      ],
+      "validation": {
+        "requires_text": true,
+        "is_card": false,
+        "is_bg": false,
+        "is_choreography": false,
+        "must_read": false
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [],
+      "visual_impact_score": 0.4,
+      "duration_range_s": [
+        3,
+        30
+      ],
+      "example_effect": "文字从右向左匀速滚动，边缘渐变遮罩"
+    },
+    {
+      "id": "feature_grid",
+      "source": "mg_library",
+      "render_component": "FeatureGrid",
+      "import_path": "../../components/mg/FeatureGrid",
+      "status": "implemented",
+      "kind": "composition",
+      "description": "功能标签卡片网格布局，适合展示产品特性矩阵(4-8个功能点)",
+      "when_to_use": "产品功能矩阵、特性列表、多点展示",
+      "when_not": "单功能用GlassCard；对比用BeforeAfter",
+      "props_schema": {
+        "features": {
+          "type": "list",
+          "required": true,
+          "min_length": 1,
+          "max_length": 8
+        },
+        "columns": {
+          "type": "int",
+          "default": 2,
+          "range": [
+            1,
+            4
+          ]
+        },
+        "card_width": {
+          "type": "int",
+          "default": 280,
+          "range": [
+            100,
+            500
+          ]
+        },
+        "card_height": {
+          "type": "int",
+          "default": 180,
+          "range": [
+            80,
+            400
+          ]
+        },
+        "delay": {
+          "type": "int",
+          "default": 0,
+          "range": [
+            0,
+            300
+          ]
+        }
+      },
+      "defaults": {
+        "features": [
+          {
+            "label": "功能A"
+          },
+          {
+            "label": "功能B"
+          },
+          {
+            "label": "功能C"
+          },
+          {
+            "label": "功能D"
+          }
+        ],
+        "columns": 2,
+        "cardWidth": 280,
+        "cardHeight": 180
+      },
+      "char_limits": {
+        "max_chars": 8,
+        "max_words": 2,
+        "note": "标签 ≤2词, description ≤10字"
+      },
+      "phases": [
+        "build"
+      ],
+      "roles": [
+        "content_cards"
+      ],
+      "tags": [
+        "grid",
+        "features",
+        "cards"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": true,
+        "is_bg": false,
+        "is_choreography": true,
+        "must_read": false
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [
+        "FeatureHighlight",
+        "IngredientDetail",
+        "ProcessStepFrame",
+        "TutorialStepFrame"
+      ],
+      "visual_impact_score": 0.75,
+      "duration_range_s": [
+        3,
+        10
+      ],
+      "example_effect": "功能卡片网格逐个弹入，交错stagger"
+    },
+    {
+      "id": "logo_reveal",
+      "source": "mg_library",
+      "render_component": "LogoReveal",
+      "import_path": "../../components/mg/LogoReveal",
+      "status": "implemented",
+      "kind": "text",
+      "description": "Logo spring弹入+蓝色辉光脉冲，适合品牌收尾、片尾logo展示",
+      "when_to_use": "品牌收尾、片尾logo、cta品牌露出",
+      "when_not": "hook开场不合适；文字内容用KineticText",
+      "props_schema": {
+        "logo_text": {
+          "type": "str",
+          "default": "Brand",
+          "max_chars": 15
+        },
+        "logo_icon": {
+          "type": "str",
+          "default": ""
+        },
+        "glow_color": {
+          "type": "str",
+          "default": "#3B82F6"
+        },
+        "delay": {
+          "type": "int",
+          "default": 0,
+          "range": [
+            0,
+            300
+          ]
+        }
+      },
+      "defaults": {
+        "logoText": "Brand",
+        "glowColor": "#3B82F6"
+      },
+      "char_limits": {
+        "max_chars": 15,
+        "max_words": 2,
+        "note": "Logo 文字, 短"
+      },
+      "phases": [
+        "cta"
+      ],
+      "roles": [
+        "logo"
+      ],
+      "tags": [
+        "logo",
+        "brand",
+        "reveal",
+        "spring"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": false,
+        "is_bg": false,
+        "is_choreography": false,
+        "must_read": false
+      },
+      "phase_blacklist": [
+        "hook"
+      ],
+      "kb_atom_names": [
+        "payoff_brand_logo"
+      ],
+      "visual_impact_score": 0.8,
+      "duration_range_s": [
+        2,
+        5
+      ],
+      "example_effect": "Logo从中心弹入，蓝色辉光脉冲扩散"
+    },
+    {
+      "id": "glow_trail",
+      "source": "mg_library",
+      "render_component": "GlowTrail",
+      "import_path": "../../components/mg/GlowTrail",
+      "status": "implemented",
+      "kind": "effect",
+      "description": "SVG路径上移动的发光粒子拖尾，适合装饰性转场、引导视线流动",
+      "when_to_use": "装饰性动效、引导视线、hook/cta装饰",
+      "when_not": "不要遮挡主要内容；纯背景用ParticleBg",
+      "props_schema": {
+        "path_d": {
+          "type": "str",
+          "default": "M 100 960 Q 300 200 540 280 T 980 200"
+        },
+        "color": {
+          "type": "str",
+          "default": "#3B82F6"
+        },
+        "trail_length": {
+          "type": "int",
+          "default": 5,
+          "range": [
+            2,
+            12
+          ]
+        },
+        "dot_size": {
+          "type": "int",
+          "default": 6,
+          "range": [
+            2,
+            20
+          ]
+        },
+        "delay": {
+          "type": "int",
+          "default": 0,
+          "range": [
+            0,
+            300
+          ]
+        }
+      },
+      "defaults": {
+        "pathD": "M 100 960 Q 300 200 540 280 T 980 200",
+        "color": "#3B82F6",
+        "trailLength": 5,
+        "dotSize": 6
+      },
+      "char_limits": null,
+      "phases": [
+        "hook",
+        "cta"
+      ],
+      "roles": [
+        "decorative"
+      ],
+      "tags": [
+        "effect",
+        "glow",
+        "trail",
+        "svg"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": false,
+        "is_bg": true,
+        "is_choreography": false,
+        "must_read": false
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [],
+      "visual_impact_score": 0.5,
+      "duration_range_s": [
+        2,
+        8
+      ],
+      "example_effect": "发光粒子沿SVG路径移动，留下渐隐拖尾"
+    },
+    {
+      "id": "light_leak",
+      "source": "mg_library",
+      "render_component": "LightLeak",
+      "import_path": "../../components/mg/CinematicEffects",
+      "status": "implemented",
+      "kind": "effect",
+      "description": "噪点驱动漂移径向渐变，screen混合模式，电影光晕效果",
+      "when_to_use": "电影感光晕、暖色调氛围、复古风格",
+      "when_not": "极简风格不要用；科技风用GradientMesh",
+      "props_schema": {
+        "intensity": {
+          "type": "float",
+          "default": 0.5,
+          "range": [
+            0.0,
+            1.0
+          ]
+        },
+        "speed": {
+          "type": "float",
+          "default": 0.3,
+          "range": [
+            0.0,
+            1.0
+          ]
+        },
+        "color1": {
+          "type": "str",
+          "default": "#ff6b35"
+        },
+        "color2": {
+          "type": "str",
+          "default": "#f7c948"
+        }
+      },
+      "defaults": {
+        "intensity": 0.5,
+        "speed": 0.3,
+        "color1": "#ff6b35",
+        "color2": "#f7c948"
+      },
+      "char_limits": null,
+      "phases": [
+        "hook",
+        "build",
+        "cta"
+      ],
+      "roles": [
+        "decorative"
+      ],
+      "tags": [
+        "effect",
+        "cinematic",
+        "light",
+        "overlay"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": false,
+        "is_bg": true,
+        "is_choreography": false,
+        "must_read": false
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [],
+      "visual_impact_score": 0.3,
+      "duration_range_s": [
+        0,
+        60
+      ],
+      "example_effect": "暖色光晕从角落缓慢漂移，screen混合叠加"
+    },
+    {
+      "id": "glitch_transition",
+      "source": "mg_library",
+      "render_component": "GlitchTransition",
+      "import_path": "../../components/mg/CinematicEffects",
+      "status": "implemented",
+      "kind": "transition",
+      "description": "RGB色差+clip-path切片，赛博朋克故障效果",
+      "when_to_use": "赛博朋克风、科技故障、hook转场",
+      "when_not": "柔和风格不要用；品牌收尾不要用",
+      "props_schema": {
+        "intensity": {
+          "type": "float",
+          "default": 0.5,
+          "range": [
+            0.0,
+            1.0
+          ]
+        },
+        "speed": {
+          "type": "float",
+          "default": 0.5,
+          "range": [
+            0.0,
+            1.0
+          ]
+        }
+      },
+      "defaults": {
+        "intensity": 0.5,
+        "speed": 0.5
+      },
+      "char_limits": null,
+      "phases": [
+        "hook"
+      ],
+      "roles": [
+        "decorative"
+      ],
+      "tags": [
+        "effect",
+        "glitch",
+        "cyberpunk",
+        "transition"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": false,
+        "is_bg": true,
+        "is_choreography": false,
+        "must_read": false
+      },
+      "phase_blacklist": [
+        "cta"
+      ],
+      "kb_atom_names": [],
+      "visual_impact_score": 0.6,
+      "duration_range_s": [
+        0.5,
+        3
+      ],
+      "example_effect": "画面RGB分离+切片错位，赛博朋克故障感"
+    },
+    {
+      "id": "gradient_mesh",
+      "source": "mg_library",
+      "render_component": "GradientMesh",
+      "import_path": "../../components/mg/CinematicEffects",
+      "status": "implemented",
+      "kind": "background",
+      "description": "多点径向渐变网格+噪点驱动位置动画，科技渐变背景",
+      "when_to_use": "科技风背景、渐变氛围、极简风装饰",
+      "when_not": "暗色霓虹风用LightLeak；复古风用FilmGrain",
+      "props_schema": {
+        "colors": {
+          "type": "list",
+          "default": [
+            "#3B82F6",
+            "#8B5CF6",
+            "#EC4899"
+          ]
+        },
+        "speed": {
+          "type": "float",
+          "default": 0.3,
+          "range": [
+            0.0,
+            1.0
+          ]
+        },
+        "blur": {
+          "type": "float",
+          "default": 80,
+          "range": [
+            20,
+            200
+          ]
+        }
+      },
+      "defaults": {
+        "colors": [
+          "#3B82F6",
+          "#8B5CF6",
+          "#EC4899"
+        ],
+        "speed": 0.3,
+        "blur": 80
+      },
+      "char_limits": null,
+      "phases": [
+        "hook",
+        "build",
+        "cta"
+      ],
+      "roles": [
+        "background"
+      ],
+      "tags": [
+        "background",
+        "gradient",
+        "mesh",
+        "tech"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": false,
+        "is_bg": true,
+        "is_choreography": false,
+        "must_read": false
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [],
+      "visual_impact_score": 0.3,
+      "duration_range_s": [
+        0,
+        60
+      ],
+      "example_effect": "多色渐变点缓慢移动，背景色彩流动"
+    },
+    {
+      "id": "film_grain",
+      "source": "mg_library",
+      "render_component": "FilmGrain",
+      "import_path": "../../components/mg/CinematicEffects",
+      "status": "implemented",
+      "kind": "effect",
+      "description": "SVG fractalNoise叠加，overlay混合模式，胶片颗粒质感",
+      "when_to_use": "复古风、胶片质感、暖色调视频",
+      "when_not": "科技风不要用；极简风不要用",
+      "props_schema": {
+        "opacity": {
+          "type": "float",
+          "default": 0.06,
+          "range": [
+            0.0,
+            0.3
+          ]
+        },
+        "speed": {
+          "type": "float",
+          "default": 0.5,
+          "range": [
+            0.0,
+            1.0
+          ]
+        }
+      },
+      "defaults": {
+        "opacity": 0.06,
+        "speed": 0.5
+      },
+      "char_limits": null,
+      "phases": [
+        "hook",
+        "build",
+        "cta"
+      ],
+      "roles": [
+        "decorative"
+      ],
+      "tags": [
+        "effect",
+        "film",
+        "grain",
+        "retro"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": false,
+        "is_bg": true,
+        "is_choreography": false,
+        "must_read": false
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [],
+      "visual_impact_score": 0.2,
+      "duration_range_s": [
+        0,
+        60
+      ],
+      "example_effect": "细微颗粒噪点叠加，胶片质感"
+    },
+    {
+      "id": "vignette",
+      "source": "mg_library",
+      "render_component": "Vignette",
+      "import_path": "../../components/mg/CinematicEffects",
+      "status": "implemented",
+      "kind": "effect",
+      "description": "径向渐变暗角，聚焦中心内容",
+      "when_to_use": "暗角效果、聚焦中心、电影感",
+      "when_not": "明亮通透风不要用",
+      "props_schema": {
+        "intensity": {
+          "type": "float",
+          "default": 0.6,
+          "range": [
+            0.0,
+            1.0
+          ]
+        }
+      },
+      "defaults": {
+        "intensity": 0.6
+      },
+      "char_limits": null,
+      "phases": [
+        "hook",
+        "build",
+        "cta"
+      ],
+      "roles": [
+        "decorative"
+      ],
+      "tags": [
+        "effect",
+        "vignette",
+        "cinematic"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": false,
+        "is_bg": true,
+        "is_choreography": false,
+        "must_read": false
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [],
+      "visual_impact_score": 0.2,
+      "duration_range_s": [
+        0,
+        60
+      ],
+      "example_effect": "画面边缘渐暗，中心内容更突出"
+    },
+    {
+      "id": "image_orbit",
+      "source": "mg_library",
+      "render_component": "ImageOrbit",
+      "import_path": "../../components/mg/ImageOrbit",
+      "status": "implemented",
+      "kind": "composition",
+      "description": "图片环绕轨道动画，多图围绕中心旋转",
+      "when_to_use": "多图展示、环绕排列、产品矩阵",
+      "when_not": "单图用FloatingMockup；网格用FeatureGrid",
+      "props_schema": {
+        "images": {
+          "type": "list",
+          "required": true
+        },
+        "radius": {
+          "type": "int",
+          "default": 200,
+          "range": [
+            50,
+            400
+          ]
+        },
+        "speed": {
+          "type": "float",
+          "default": 0.5,
+          "range": [
+            0.0,
+            2.0
+          ]
+        }
+      },
+      "defaults": {
+        "images": [],
+        "radius": 200,
+        "speed": 0.5
+      },
+      "char_limits": null,
+      "phases": [
+        "build"
+      ],
+      "roles": [
+        "content_cards"
+      ],
+      "tags": [
+        "composition",
+        "orbit",
+        "images"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": false,
+        "is_bg": false,
+        "is_choreography": true,
+        "must_read": false
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [],
+      "visual_impact_score": 0.7,
+      "duration_range_s": [
+        3,
+        10
+      ],
+      "example_effect": "多张图片围绕中心缓慢旋转，带透视变化"
+    },
+    {
+      "id": "photo_stack",
+      "source": "mg_library",
+      "render_component": "PhotoStack",
+      "import_path": "../../components/mg/PhotoStack",
+      "status": "implemented",
+      "kind": "composition",
+      "description": "照片堆叠效果，多图层叠展示",
+      "when_to_use": "多图堆叠、照片墙、素材展示",
+      "when_not": "单图用FloatingMockup；有序排列用FeatureGrid",
+      "props_schema": {
+        "images": {
+          "type": "list",
+          "required": true
+        },
+        "spread": {
+          "type": "int",
+          "default": 30,
+          "range": [
+            5,
+            100
+          ]
+        }
+      },
+      "defaults": {
+        "images": [],
+        "spread": 30
+      },
+      "char_limits": null,
+      "phases": [
+        "build"
+      ],
+      "roles": [
+        "content_cards"
+      ],
+      "tags": [
+        "composition",
+        "stack",
+        "images"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": false,
+        "is_bg": false,
+        "is_choreography": true,
+        "must_read": false
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [],
+      "visual_impact_score": 0.65,
+      "duration_range_s": [
+        3,
+        8
+      ],
+      "example_effect": "照片层叠散开，带旋转和阴影"
+    },
+    {
+      "id": "geometric_lines",
+      "source": "mg_library",
+      "render_component": "GeometricLines",
+      "import_path": "../../components/mg/GeometricLines",
+      "status": "implemented",
+      "kind": "effect",
+      "description": "几何线条装饰动画",
+      "when_to_use": "科技风装饰、几何背景、极简风点缀",
+      "when_not": "复古风不要用；暖色调不要用",
+      "props_schema": {},
+      "defaults": {},
+      "char_limits": null,
+      "phases": [
+        "hook",
+        "build",
+        "cta"
+      ],
+      "roles": [
+        "decorative"
+      ],
+      "tags": [
+        "effect",
+        "geometric",
+        "lines",
+        "tech"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": false,
+        "is_bg": true,
+        "is_choreography": false,
+        "must_read": false
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [],
+      "visual_impact_score": 0.3,
+      "duration_range_s": [
+        0,
+        60
+      ],
+      "example_effect": "几何线条从无到有绘制，科技感装饰"
+    },
+    {
+      "id": "feature_scroller",
+      "source": "mg_library",
+      "render_component": "FeatureScroller",
+      "import_path": "../../components/mg/FeatureScroller",
+      "status": "implemented",
+      "kind": "composition",
+      "description": "功能滚动展示，垂直滚动的功能列表",
+      "when_to_use": "长功能列表、滚动展示、特性对比",
+      "when_not": "短列表用FeatureGrid；单功能用GlassCard",
+      "props_schema": {
+        "features": {
+          "type": "list",
+          "required": true
+        }
+      },
+      "defaults": {
+        "features": []
+      },
+      "char_limits": null,
+      "phases": [
+        "build"
+      ],
+      "roles": [
+        "content_cards"
+      ],
+      "tags": [
+        "composition",
+        "scroll",
+        "features"
+      ],
+      "validation": {
+        "requires_text": false,
+        "is_card": false,
+        "is_bg": false,
+        "is_choreography": true,
+        "must_read": false
+      },
+      "phase_blacklist": [],
+      "kb_atom_names": [],
+      "visual_impact_score": 0.6,
+      "duration_range_s": [
+        3,
+        10
+      ],
+      "example_effect": "功能列表垂直滚动，逐项高亮"
+    }
+  ]
+}

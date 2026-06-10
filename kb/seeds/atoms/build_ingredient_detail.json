@@ -1,0 +1,20 @@
+{
+  "atom_id": "build_ingredient_detail",
+  "type": "shot",
+  "category": "build",
+  "remotion_component": "IngredientDetail",
+  "description": "成分/材料特写，展示产品核心成分或材质",
+  "required_inputs": [
+    "ingredient_image"
+  ],
+  "fills_shot_types": [
+    "product_zoom_in"
+  ],
+  "duration_min_s": 2.0,
+  "duration_max_s": 4.0,
+  "visual_impact_score": 0.72,
+  "tech_stack": [
+    "remotion",
+    "ken_burns"
+  ]
+}

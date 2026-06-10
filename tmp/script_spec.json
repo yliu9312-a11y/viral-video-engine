@@ -1,0 +1,140 @@
+{
+  "fps": 30,
+  "globalStyle": {
+    "bgColor": "#050510",
+    "palette": "promo"
+  },
+  "shots": [
+    {
+      "id": "beat_hook_0",
+      "role": "hook",
+      "component": "WordReveal",
+      "props": {
+        "text": "What if a friend was always there?",
+        "gradient": "linear-gradient(90deg, #9CA3AF, #FFFFFF, #3B82F6)",
+        "color": "#FFFFFF",
+        "delay": 0,
+        "fontSize": 64,
+        "staggerFrames": 4
+      },
+      "start": 0,
+      "duration": 155,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "beat_hook_1",
+      "role": "hook",
+      "component": "GlowTrail",
+      "props": {
+        "color": "#3B82F6",
+        "delay": 30,
+        "trailLength": 5,
+        "dotSize": 6,
+        "pathD": "M 100,800 Q 300,200 540,300"
+      },
+      "start": 0,
+      "duration": 155,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "beat_hook_2",
+      "role": "hook",
+      "component": "TypewriterPrompt",
+      "props": {
+        "text": "Remember that time we...",
+        "delay": 10,
+        "charInterval": 1,
+        "showCursor": true,
+        "glowColor": "#3B82F6"
+      },
+      "start": 155,
+      "duration": 125,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "beat_build_3",
+      "role": "build",
+      "component": "GlassCard",
+      "props": {
+        "text": "",
+        "width": 280,
+        "height": 200,
+        "float": true,
+        "delay": 0,
+        "glowColor": "rgba(59, 130, 246, 0.3)"
+      },
+      "start": 280,
+      "duration": 210,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "beat_build_4",
+      "role": "build",
+      "component": "MarqueeText",
+      "props": {
+        "text": "Laugh • Share • Grow • Support • Memories • Together",
+        "speed": 2.5,
+        "color": "rgba(255, 255, 255, 0.35)",
+        "direction": "left",
+        "fontSize": 28
+      },
+      "start": 280,
+      "duration": 210,
+      "position": "lower",
+      "transition": "crossfade"
+    },
+    {
+      "id": "beat_build_5",
+      "role": "build",
+      "component": "GradientText",
+      "props": {
+        "text": "From strangers to soulmates",
+        "gradient": "linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899)",
+        "delay": 0,
+        "fontSize": 64,
+        "fontWeight": 800,
+        "shimmerSpeed": 0.02
+      },
+      "start": 490,
+      "duration": 168,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "beat_cta_6",
+      "role": "cta",
+      "component": "GradientText",
+      "props": {
+        "text": "From strangers to soulmates",
+        "gradient": "linear-gradient(90deg, #9CA3AF, #FFFFFF, #3B82F6)",
+        "delay": 0,
+        "fontSize": 64,
+        "fontWeight": 800,
+        "shimmerSpeed": 0.02
+      },
+      "start": 658,
+      "duration": 125,
+      "position": "upper",
+      "transition": "crossfade"
+    },
+    {
+      "id": "beat_cta_7",
+      "role": "cta",
+      "component": "LogoReveal",
+      "props": {
+        "delay": 0,
+        "glowColor": "#3B82F6",
+        "logoText": "SoulCircle",
+        "logoIcon": "💛"
+      },
+      "start": 658,
+      "duration": 125,
+      "position": "lower",
+      "transition": "crossfade"
+    }
+  ]
+}

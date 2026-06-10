@@ -1,0 +1,72 @@
+[
+  {
+    "need": {
+      "phase": "hook",
+      "kind": "text",
+      "role": "hero_text",
+      "content_lang": "en",
+      "content_len": 6,
+      "style_family": "dark_neon_ui",
+      "mood": "energetic"
+    },
+    "choice": "word_reveal",
+    "params": {"text": "Explore Wuhan", "fontSize": 96, "staggerFrames": 3},
+    "why": "6个英文词适合逐词揭示，stagger节奏感强，dark_neon风格配白色大字+渐变效果好。比GradientText更有层次感。"
+  },
+  {
+    "need": {
+      "phase": "hook",
+      "kind": "text",
+      "role": "hero_text",
+      "content_lang": "zh",
+      "content_len": 4,
+      "style_family": "bright_airy",
+      "mood": "warm"
+    },
+    "choice": "gradient_text",
+    "params": {"text": "武汉文化", "fontSize": 64, "fontWeight": 900, "shimmerSpeed": 0.03},
+    "why": "4个中文字适合渐变大标题，shimmer光效增加高级感。bright_airy风格配浅色渐变。比WordReveal更适合中文短标题。"
+  },
+  {
+    "need": {
+      "phase": "build",
+      "kind": "composition",
+      "role": "content_cards",
+      "content_lang": "zh",
+      "content_len": 8,
+      "style_family": "dark_cinematic",
+      "mood": "dramatic"
+    },
+    "choice": "glass_card",
+    "params": {"text": "黄鹤楼：千古名楼", "width": 280, "height": 200, "float": true},
+    "why": "玻璃拟态卡片适合展示单个景点/特性，float动效增加层次。dark_cinematic风格配蓝色边框发光。8个中文字在260px宽度内可读。"
+  },
+  {
+    "need": {
+      "phase": "build",
+      "kind": "text",
+      "role": "bottom_ticker",
+      "content_lang": "en",
+      "content_len": 40,
+      "style_family": "minimal_tech",
+      "mood": "calm"
+    },
+    "choice": "marquee_text",
+    "params": {"text": "Hot Dry Noodles • Cherry Blossoms • Yangtze River • East Lake", "speed": 2.5, "fontSize": 28},
+    "why": "长关键词列表适合跑马灯滚动，不占主视觉空间。minimal_tech风格配低透明度文字。40字符在滚动中可读。"
+  },
+  {
+    "need": {
+      "phase": "cta",
+      "kind": "text",
+      "role": "logo",
+      "content_lang": "en",
+      "content_len": 5,
+      "style_family": "vibrant_social",
+      "mood": "energetic"
+    },
+    "choice": "logo_reveal",
+    "params": {"logoText": "Wuhan", "glowColor": "#FF416C"},
+    "why": "品牌收尾用LogoReveal，spring弹入+辉光脉冲有仪式感。vibrant_social风格配粉色辉光。短品牌名(5字)完美适配。"
+  }
+]

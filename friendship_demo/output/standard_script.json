@@ -1,0 +1,157 @@
+{
+  "fps": 30,
+  "globalStyle": {
+    "bgColor": "#050510",
+    "palette": "promo"
+  },
+  "shots": [
+    {
+      "id": "std_hook_0",
+      "role": "hook",
+      "component": "WordReveal",
+      "props": {
+        "text": "你真的了解自己吗？",
+        "color": "#FFFFFF",
+        "delay": 0,
+        "_easing_profile": "smooth",
+        "fontSize": 96,
+        "staggerFrames": 3
+      },
+      "start": 0,
+      "duration": 90,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "std_hook_1",
+      "role": "hook",
+      "component": "GradientText",
+      "props": {
+        "text": "还是...已经晚了？",
+        "delay": 0,
+        "_easing_profile": "smooth",
+        "fontSize": 96,
+        "fontWeight": 800,
+        "shimmerSpeed": 0.02
+      },
+      "start": 90,
+      "duration": 90,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "std_build_2",
+      "role": "build",
+      "component": "GlassCard",
+      "props": {
+        "text": "AI驱动，智能优化",
+        "width": 280,
+        "height": 200,
+        "float": false,
+        "delay": 0,
+        "_easing_profile": "smooth",
+        "glowColor": "#3B82F6"
+      },
+      "start": 180,
+      "duration": 180,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "std_build_3",
+      "role": "build",
+      "component": "FeatureGrid",
+      "props": {
+        "features": [
+          {
+            "label": "智能剪辑"
+          },
+          {
+            "label": "一键成片"
+          },
+          {
+            "label": "多平台适配"
+          },
+          {
+            "label": "数据洞察"
+          }
+        ],
+        "columns": 2,
+        "delay": 0,
+        "_easing_profile": "smooth",
+        "cardWidth": 280,
+        "cardHeight": 180
+      },
+      "start": 360,
+      "duration": 240,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "std_build_4",
+      "role": "build",
+      "component": "MarqueeText",
+      "props": {
+        "text": "效率提升300% · 专业级效果 · 零门槛创作 · 持续更新",
+        "color": "#FFFFFF",
+        "speed": 3.3,
+        "direction": "left",
+        "_easing_profile": "smooth",
+        "fontSize": 28
+      },
+      "start": 600,
+      "duration": 240,
+      "position": "lower",
+      "transition": "crossfade"
+    },
+    {
+      "id": "std_build_5",
+      "role": "build",
+      "component": "ParticleBg",
+      "props": {
+        "color": "#3B82F6",
+        "count": 25,
+        "style": "float",
+        "opacity": 0.3,
+        "_easing_profile": "smooth",
+        "secondaryColor": "#FF416C"
+      },
+      "start": 840,
+      "duration": 194,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "std_payoff_cta_6",
+      "role": "cta",
+      "component": "GradientText",
+      "props": {
+        "text": "立即获取完整方案",
+        "delay": 0,
+        "_easing_profile": "smooth",
+        "fontSize": 96,
+        "fontWeight": 800,
+        "shimmerSpeed": 0.02
+      },
+      "start": 540,
+      "duration": 79,
+      "position": "center",
+      "transition": "crossfade"
+    },
+    {
+      "id": "std_payoff_cta_7",
+      "role": "cta",
+      "component": "LogoReveal",
+      "props": {
+        "delay": 0,
+        "_easing_profile": "smooth",
+        "glowColor": "#3B82F6",
+        "logoText": "YourBrand"
+      },
+      "start": 619,
+      "duration": 60,
+      "position": "center",
+      "transition": "crossfade"
+    }
+  ]
+}

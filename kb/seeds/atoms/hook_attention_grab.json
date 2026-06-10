@@ -1,0 +1,21 @@
+{
+  "atom_id": "hook_attention_grab",
+  "type": "shot",
+  "category": "hook",
+  "remotion_component": "AttentionGrabber",
+  "description": "高能量开场画面，配合动效快速抓住注意力",
+  "required_inputs": [
+    "bg_video_or_image"
+  ],
+  "fills_shot_types": [
+    "hook_attention_grabber"
+  ],
+  "duration_min_s": 1.0,
+  "duration_max_s": 3.0,
+  "visual_impact_score": 0.9,
+  "tech_stack": [
+    "remotion",
+    "gsap",
+    "lottie"
+  ]
+}

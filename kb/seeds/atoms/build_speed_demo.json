@@ -1,0 +1,19 @@
+{
+  "atom_id": "build_speed_demo",
+  "type": "shot",
+  "category": "build",
+  "remotion_component": "SpeedChangeDemo",
+  "description": "变速演示，慢放展示细节或快进展示效率",
+  "required_inputs": [
+    "demo_video"
+  ],
+  "fills_shot_types": [
+    "usage_scenario"
+  ],
+  "duration_min_s": 2.0,
+  "duration_max_s": 5.0,
+  "visual_impact_score": 0.73,
+  "tech_stack": [
+    "remotion"
+  ]
+}

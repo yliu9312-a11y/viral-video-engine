@@ -1,0 +1,24 @@
+{
+  "template_id": "tpl_test_aigc",
+  "material_count": 2,
+  "materials": [
+    {"path": "/Users/adrian-us/viral-video-engine/data/test/materials/product_front.jpg", "type": "image", "tagged_types": ["product_zoom_in"], "duration": 3.0, "description": ""},
+    {"path": "/Users/adrian-us/viral-video-engine/data/test/materials/product_side.jpg", "type": "image", "tagged_types": ["product_zoom_in"], "duration": 3.0, "description": ""}
+  ],
+  "gaps": [
+    {
+      "phase": "build",
+      "missing_shot_types": ["usage_scenario"],
+      "duration_shortfall": 5.0,
+      "shot_count_shortfall": 2,
+      "low_quality_count": 0,
+      "severity": "HIGH",
+      "impact_on_video": "缺少使用场景，会让中段展示环节的表现力下降。",
+      "recommended_strategies": [
+        {"id": "D", "name": "AIGC 生成", "description": "用 Gemini 本地生成场景图", "priority": 3},
+        {"id": "C", "name": "包装补全", "description": "用 Remotion 组件填充", "priority": 2}
+      ]
+    }
+  ],
+  "summary": {"total_gaps": 1, "high_severity": 1, "medium_severity": 0, "low_severity": 0}
+}
