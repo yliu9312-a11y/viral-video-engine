@@ -18,14 +18,25 @@ function App() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-root)' }}>
-      {/* Nav bar — hidden on editor page for more space */}
-      {page !== 'editor' && (
-        <nav style={styles.nav}>
-          <div style={styles.navInner}>
-            <span style={styles.logo}>VST</span>
+      <nav style={styles.nav}>
+        <div style={styles.navInner}>
+          <span style={styles.logo}>VST</span>
+          <div style={styles.tabs}>
+            <button
+              style={{ ...styles.tabBtn, ...(page === 'pipeline' ? styles.tabActive : {}) }}
+              onClick={() => setPage('pipeline')}
+            >
+              流水线
+            </button>
+            <button
+              style={{ ...styles.tabBtn, ...(page === 'editor' ? styles.tabActive : {}) }}
+              onClick={() => setPage('editor')}
+            >
+              🎬 编辑器
+            </button>
           </div>
-        </nav>
-      )}
+        </div>
+      </nav>
 
       <div style={{ animation: 'fadeInUp 0.3s ease-out' }}>
         {page === 'pipeline' && <HomePage />}
@@ -50,6 +61,7 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '0 1.5rem',
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'space-between',
     height: 52,
   },
   logo: {
@@ -58,6 +70,26 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 18,
     color: 'var(--accent)',
     letterSpacing: '0.05em',
+  },
+  tabs: {
+    display: 'flex',
+    gap: 0,
+  },
+  tabBtn: {
+    background: 'transparent',
+    border: 'none',
+    borderBottom: '2px solid transparent',
+    color: 'var(--text-muted)',
+    fontSize: 14,
+    fontWeight: 600,
+    fontFamily: 'var(--font-display)',
+    padding: '14px 20px',
+    cursor: 'pointer',
+    transition: 'color 0.2s, border-color 0.2s',
+  },
+  tabActive: {
+    color: 'var(--text-primary)',
+    borderBottomColor: 'var(--accent)',
   },
 };
 
