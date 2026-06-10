@@ -388,7 +388,7 @@ def _vlm_call(frames_b64: list[str], prompt: str, max_tokens: int = 3000, retrie
                     "temperature": 0.1,
                 },
                 headers={"Authorization": f"Bearer {api_key}"},
-                timeout=90.0,
+                timeout=120.0,
             )
             if resp.status_code == 429:
                 wait = 2 ** (attempt + 1)

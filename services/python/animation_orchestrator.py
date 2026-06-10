@@ -1581,7 +1581,7 @@ async def orchestrate_animation(
             "temperature": 0.4,
             "max_tokens": 800,
         }
-        resp = httpx.post(MIMO_API_URL, json=payload, headers=headers, timeout=60.0)
+        resp = httpx.post(MIMO_API_URL, json=payload, headers=headers, timeout=120.0)
         resp.raise_for_status()
         msg = resp.json()["choices"][0]["message"]
         raw_output = msg.get("content", "").strip()
@@ -1596,7 +1596,7 @@ async def orchestrate_animation(
                 error_msg = f"shots 组件名必须是: {list(COMPONENT_CATALOG.keys())}"
                 retry_prompt = _build_retry_prompt(prompt, raw_output, error_msg)
                 payload["messages"] = [{"role": "user", "content": retry_prompt}]
-                resp2 = httpx.post(MIMO_API_URL, json=payload, headers=headers, timeout=60.0)
+                resp2 = httpx.post(MIMO_API_URL, json=payload, headers=headers, timeout=120.0)
                 resp2.raise_for_status()
                 raw2 = resp2.json()["choices"][0]["message"].get("content", "").strip()
                 if raw2:

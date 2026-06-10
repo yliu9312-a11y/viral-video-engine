@@ -197,7 +197,7 @@ def caption_shot(frames: list[np.ndarray], shot_index: int) -> tuple[str, str]:
         headers = {"Authorization": f"Bearer {mimo_key}"}
         for attempt in range(3):
             try:
-                resp = httpx.post(mimo_url, json=payload, headers=headers, timeout=60.0)
+                resp = httpx.post(mimo_url, json=payload, headers=headers, timeout=120.0)
                 if resp.status_code == 200:
                     data = resp.json()
                     msg = data["choices"][0]["message"]

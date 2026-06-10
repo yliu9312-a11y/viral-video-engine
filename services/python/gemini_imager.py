@@ -49,7 +49,7 @@ def generate_image(
     }
 
     try:
-        resp = httpx.post(url, json=payload, timeout=60.0)
+        resp = httpx.post(url, json=payload, timeout=120.0)
         resp.raise_for_status()
         data = resp.json()
 

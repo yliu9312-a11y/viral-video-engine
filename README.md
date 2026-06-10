@@ -103,16 +103,26 @@ rm -rf data/graph.db && docker compose run --rm seed && docker compose up
 ## 本地开发 (不用 Docker)
 
 ```bash
-# 依赖安装
+# 1. 克隆仓库
+git clone https://github.com/yliu9312-a11y/viral-video-engine.git
+cd viral-video-engine
+
+# 2. 配置环境变量
+cp .env.example .env
+# 编辑 .env，填入:
+#   MIMO_API_KEY=your-mimo-api-key     (必填)
+#   GEMINI_API_KEY=your-gemini-api-key (选填，不填则跳过图片生成)
+
+# 3. 依赖安装
 pip install -r services/python/requirements.txt
 cd services/node && npm install && cd ../..
 cd web && npm install && cd ..
 
-# 一键启动三个服务
+# 4. 一键启动三个服务
 ./scripts/start.sh
 
-# 或手动分别启动:
-cd services/python && PYTHONPATH=.. uvicorn main:app --reload --port 8000
+# 或手动分别启动 (三个终端分别执行):
+cd services/python && uvicorn main:app --reload --port 8000
 cd services/node && npm run dev    # :3000
 cd web && npm run dev              # :5173
 ```

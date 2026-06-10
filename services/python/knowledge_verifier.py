@@ -336,7 +336,7 @@ def verify_with_llm(
                 "max_tokens": 2000,
             },
             headers={"Authorization": f"Bearer {MIMO_API_KEY}"},
-            timeout=60.0,
+            timeout=120.0,
         )
         if resp.status_code != 200:
             logger.warning(f"LLM 验证调用失败: {resp.status_code}")
