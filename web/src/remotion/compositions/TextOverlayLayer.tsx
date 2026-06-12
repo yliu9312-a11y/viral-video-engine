@@ -85,23 +85,39 @@ export function scheduleFocusTexts(
   sceneStartFrame: number,
   sceneDurationFrames: number,
   fps: number,
-  holdSec = 1.4,
+  holdSec = 1.4,   // 最小持续时长下限（秒），均分后若更长则用均分值
   gapSec = 0.15
 ): ScheduleEntry[] {
   const entries: ScheduleEntry[] = [];
-  const holdFrames = Math.round(holdSec * fps);
   const gapFrames = Math.round(gapSec * fps);
+  const minHoldFrames = Math.round(holdSec * fps);
 
   // 分离焦点区和常驻区
   const focusSpecs = specs.filter((s) => (s.zone || "focus") === "focus");
   const cornerSpecs = specs.filter((s) => s.zone === "corner");
 
+  // holdFrames 自适应：均分整个场景时长，不少于 holdSec 下限
+  // 保证 4s 场景 2 条文字也能各占约 2s，而非每条固定 1.4s 后留白
+  const n = focusSpecs.length;
+  const holdFrames =
+    n > 0
+      ? Math.max(
+          minHoldFrames,
+          Math.floor((sceneDurationFrames - (n - 1) * gapFrames) / n)
+        )
+      : minHoldFrames;
+
   // 焦点区：串行排程
   let cursor = sceneStartFrame;
-  for (const spec of focusSpecs) {
+  for (let i = 0; i < focusSpecs.length; i++) {
+    const spec = focusSpecs[i];
     const start = cursor;
-    const end = Math.min(start + holdFrames, sceneStartFrame + sceneDurationFrames);
     if (start >= sceneStartFrame + sceneDurationFrames) break;
+    // 最后一条钳到场景末尾
+    const isLast = i === focusSpecs.length - 1;
+    const end = isLast
+      ? sceneStartFrame + sceneDurationFrames
+      : Math.min(start + holdFrames, sceneStartFrame + sceneDurationFrames);
     entries.push({ spec, startFrame: start, endFrame: end });
     cursor = end - gapFrames; // 下一个略微提前接上（crossfade）
   }

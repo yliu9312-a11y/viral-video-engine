@@ -1,6 +1,8 @@
 """VST Python Service: S1 video analysis + S2 structure extraction + S3 gap detection."""
 
 import json
+import math
+import os
 import uuid
 from pathlib import Path
 
@@ -471,7 +473,7 @@ async def orchestrate(req: OrchestrateRequest):
 
             try:
                 render_input = await orchestrate_animation(
-                    phase_name, gap, kb_atoms, [], template,
+                    phase_name, gap, kb_atoms, phase_data.get("materials", []), template,
                     control_vector=cv_dict,
                 )
                 scripts[phase_name] = render_input
@@ -790,7 +792,7 @@ def _style_migrate_blocking(video_path: str, topic: str) -> dict:
     scene_images = _generate_scene_images(topic, d["scenes"], str(output_dir), style_profile)
     print(f"[style_migrate] 图片生成完成 ({_time.time()-t_start:.0f}s)", flush=True)
 
-    # 替换图片路径
+    # 替换图片路径（生成失败时保留原 content_src 裁剪图，避免渲染端整块消失）
     for i, sc in enumerate(d["scenes"]):
         imgs = scene_images.get(i, [])
         img_idx = 0
@@ -800,7 +802,13 @@ def _style_migrate_blocking(video_path: str, topic: str) -> dict:
                     el["content_src"] = f"data/output/{job_id}/generated/{imgs[img_idx]}"
                     img_idx += 1
                 else:
-                    el["content_src"] = ""
+                    # 生成失败：保留原 content_src（参考帧裁剪图），不置空
+                    orig = el.get("content_src", "")
+                    if orig and os.path.isabs(orig):
+                        # 绝对路径改写为相对项目根目录路径
+                        fname = os.path.basename(orig)
+                        el["content_src"] = f"data/output/{job_id}/{fname}"
+                    # 若已是相对路径或空，保持不变
 
     # 5. motion_path 关键帧
     generate_motion_paths_for_decomp(d, scene_motions, fps=d.get("fps", 30))
@@ -820,11 +828,22 @@ def _style_migrate_blocking(video_path: str, topic: str) -> dict:
             x, y = _clamp_to_safe_zone(x, y, w, h)
             sp["x"] = x
             sp["y"] = y
-        # 限制同屏元素数
+        # 限制同屏元素数：按视觉重要性保 top-4（面积 × 接近中心度）
         MAX_EL = 4
+        from math import hypot
         visible = [el for el in sc["elements"] if el.get("content_src") or el.get("content_text")]
         if len(visible) > MAX_EL:
-            sc["elements"] = visible[:MAX_EL]
+            def _importance(el):
+                sp = el.get("spatial", {})
+                x = sp.get("x", 50)
+                y = sp.get("y", 50)
+                w = sp.get("width", 30)
+                h = sp.get("height", 30)
+                return (w * h) * (1 - min(1.0, math.hypot(x - 50, y - 50) / 70))
+            scored = sorted(range(len(visible)), key=lambda idx: _importance(visible[idx]), reverse=True)
+            top_indices = set(scored[:MAX_EL])
+            # 保持原相对顺序
+            sc["elements"] = [el for i, el in enumerate(visible) if i in top_indices]
 
     # S3.5 美感校验 + 自动修复（与主管线一致）
     from render_validator import validate_and_fix_decomposition
@@ -840,6 +859,33 @@ def _style_migrate_blocking(video_path: str, topic: str) -> dict:
         frame += sc["duration_frames"]
     d["total_frames"] = frame
 
+    # C5: 转场接线 — 每个场景 transition_out = 下一场景 entrance_transition 镜像
+    # 语义：该场景结束时如何过渡到下一场景（契约 3）
+    VALID_TRANSITIONS = {"cut", "fade", "slide"}
+    scenes_list = d["scenes"]
+    for si, sc in enumerate(scenes_list):
+        if si < len(scenes_list) - 1:
+            next_sc = scenes_list[si + 1]
+            ent = next_sc.get("entrance_transition", {})
+            t_type = ent.get("type", "fade")
+            if t_type not in VALID_TRANSITIONS:
+                t_type = "fade"
+            t_dir = ent.get("direction", "")
+            sc["transition_out"] = {"type": t_type, "direction": t_dir}
+        else:
+            sc["transition_out"] = {"type": "fade", "direction": ""}
+
+    # C6: BGM — 按 style_family 选音轨（契约 1）
+    BGM_MAP = {
+        "dark_neon_ui": "bgm_dark.m4a",
+        "dark_cinematic": "bgm_dark.m4a",
+        "retro_film": "bgm_dark.m4a",
+        "bright_airy": "bgm_bright.m4a",
+        "vibrant_social": "bgm_bright.m4a",
+    }
+    bgm_file = BGM_MAP.get(style_profile.style_family, "bgm_neutral.m4a")
+    d["bgm"] = {"src": f"bgm/{bgm_file}", "volume": 0.22}
+
     # 保存 StyleProfile
     d["style_profile"] = style_profile.to_dict()
 
@@ -848,14 +894,19 @@ def _style_migrate_blocking(video_path: str, topic: str) -> dict:
     with open(decomp_path, "w", encoding="utf-8") as f:
         json.dump(d, f, ensure_ascii=False, indent=2)
 
-    # 复制图片到 web/public
+    # 复制图片到 web/public（generated png + 裁剪 jpg 全部复制）
     import shutil
-    public_gen_dir = PROJECT_ROOT / "web" / "public" / "data" / "output" / job_id / "generated"
+    public_out_dir = PROJECT_ROOT / "web" / "public" / "data" / "output" / job_id
+    public_gen_dir = public_out_dir / "generated"
     public_gen_dir.mkdir(parents=True, exist_ok=True)
+    # 复制生成图（png）
     gen_dir = output_dir / "generated"
     if gen_dir.exists():
         for img in gen_dir.glob("*.png"):
             shutil.copy2(img, public_gen_dir / img.name)
+    # 复制裁剪图（jpg，output_dir 根目录）
+    for img in output_dir.glob("*.jpg"):
+        shutil.copy2(img, public_out_dir / img.name)
 
     return {
         "success": True,
@@ -906,14 +957,14 @@ async def style_migrate(req: StyleMigrateRequest):
                     decomp_obj = decomposition_from_dict(d)
                     template = decomposition_to_orchestrator_template(decomp_obj, topic=req.topic)
                     spec = await orchestrate_from_beats(template, topic=req.topic, verify=False)
-                    llm_texts = {}
+                    # C7: 从 spec["shots"] 按顺序收集非空 text 列表
+                    texts: list[str] = []
                     for shot in spec.get("shots", []):
-                        role = shot.get("role", "")
                         text = shot.get("props", {}).get("text", "")
-                        if role and text:
-                            llm_texts.setdefault(role, []).append(text)
-                    if llm_texts:
-                        _inject_text_and_effects(d, llm_texts, [])
+                        if text and text.strip():
+                            texts.append(text.strip())
+                    if texts:
+                        _inject_texts_per_scene(d, texts)
                         with open(decomp_path, "w", encoding="utf-8") as f:
                             json.dump(d, f, ensure_ascii=False, indent=2)
                         result["decomposition"] = d
@@ -949,7 +1000,7 @@ def _vlm_analyze_motion(video_path: str, scenes: list[dict]) -> list[dict]:
 
     results = []
     # 只对部分场景做 VLM 运动分析（避免 13 个场景 × 75s 超时 = 16 分钟）
-    sample_indices = set(range(0, len(scenes), max(1, len(scenes) // 4)))  # 最多 4 个
+    sample_indices = set(range(0, len(scenes), max(1, len(scenes) // 6)))  # 最多 6 个
     for si, sc in enumerate(scenes):
         start_f = sc.get("start_frame", 0)
         end_f = sc.get("end_frame", total)
@@ -984,35 +1035,38 @@ def _vlm_analyze_motion(video_path: str, scenes: list[dict]) -> list[dict]:
     return results
 
 
-def _generate_scene_images(topic, scenes, output_dir, style_profile):
-    """Gemini 图片生成（注入风格）。"""
-    from gemini_imager import generate_image
-    import shutil
+def _generate_scene_images(
+    topic: str,
+    scenes: list,
+    output_dir: str,
+    style_profile,
+    aspect_ratio: str = "16:9",
+) -> dict:
+    """Gemini 图片生成（注入风格）。
 
-    PROMPTS = {
+    prompt 以 topic 开头（主题解耦），模板为与城市无关的通用构图描述。
+    并发生成（max_workers=3）加速。
+    """
+    from gemini_imager import generate_image
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    # 通用构图模板（英文，不含城市/地名，每次生成以 topic 开头拼接）
+    TEMPLATES: dict[str, list[str]] = {
         "hook": [
-            "cinematic aerial view, dramatic sky, golden hour, 4K",
-            "iconic landmark, sunset, city skyline, warm tones",
-            "street food close-up, steam rising, warm lighting",
-            "city skyline at blue hour, rivers, modern buildings",
-            "cherry blossoms, pink petals, dreamy spring",
-            "food street at night, neon lights, vibrant",
+            "wide cinematic opening shot, dramatic sky, golden hour, 4K",
+            "iconic landmark close-up, strong silhouette, warm tones",
+            "vibrant street scene, wide angle, people in motion, dusk",
         ],
         "build": [
-            "scenic greenway, spring sunlight, serene 4K",
-            "food street night, neon signs, bustling",
-            "ferry crossing, city lights on water, blue hour",
-            "university campus, cherry blossoms, students",
-            "engineering marvel bridge, double decker",
-            "historic temple architecture, golden light",
-            "pedestrian street, historic buildings, modern shops",
-            "panoramic river view, green bridge, golden hour",
+            "detail shot, natural light, shallow depth of field, lifestyle",
+            "process shot, hands at work, warm ambient light, authentic",
+            "environmental portrait, candid moment, outdoor setting",
+            "architectural detail, geometric pattern, clean lines",
         ],
         "cta": [
-            "panorama from tower, rivers merging, dramatic clouds",
-            "morning street life, breakfast culture, warm daily scene",
-            "night skyline, colorful lights, river reflection",
-            "tower at night, illuminated, golden glow, majestic",
+            "sweeping panorama, full scene, dramatic clouds, high vantage point",
+            "night scene, city lights, long exposure, reflective surfaces",
+            "final wide shot, golden hour, sense of scale, cinematic",
         ],
     }
 
@@ -1020,7 +1074,8 @@ def _generate_scene_images(topic, scenes, output_dir, style_profile):
     img_dir = Path(output_dir) / "generated"
     img_dir.mkdir(parents=True, exist_ok=True)
 
-    scene_images = {}
+    # 构建任务列表
+    tasks: list[tuple[int, int, str, str]] = []  # (scene_idx, img_idx, fname, prompt)
     for i, sc in enumerate(scenes):
         if i == 0 or i <= n * 0.25:
             phase = "hook"
@@ -1029,24 +1084,88 @@ def _generate_scene_images(topic, scenes, output_dir, style_profile):
         else:
             phase = "build"
 
-        prompts = PROMPTS.get(phase, PROMPTS["build"])
-        n_imgs = max(2, min(len(sc.get("elements", [])), 3))  # 最多 3 张，控制总时间
-        paths = []
+        templates = TEMPLATES.get(phase, TEMPLATES["build"])
+        n_imgs = max(2, min(len(sc.get("elements", [])), 3))
 
         for j in range(n_imgs):
             fname = f"s{i}_gen_{j}.png"
             fpath = str(img_dir / fname)
             if Path(fpath).exists():
-                paths.append(fname)
+                tasks.append((i, j, fname, ""))  # 已存在，跳过生成
                 continue
-            prompt = prompts[j % len(prompts)]
-            result = generate_image(prompt, fpath, width=1280, height=720, style_profile=style_profile)
-            if result:
-                paths.append(fname)
+            # prompt 以 topic 开头保证主题相关性
+            template = templates[j % len(templates)]
+            prompt = f"{topic}, {template}"
+            tasks.append((i, j, fname, prompt))
 
-        scene_images[i] = paths
+    # 分组：需要生成 vs 已存在
+    to_generate = [(si, ji, fn, pr) for si, ji, fn, pr in tasks if pr]
+    already_done = [(si, ji, fn) for si, ji, fn, pr in tasks if not pr]
+
+    scene_images: dict[int, list[str]] = {}
+    for si, ji, fn in already_done:
+        scene_images.setdefault(si, []).append(fn)
+
+    def _gen_one(args):
+        si, ji, fname, prompt = args
+        fpath = str(img_dir / fname)
+        result = generate_image(
+            prompt, fpath,
+            width=1280, height=720,
+            style_profile=style_profile,
+            aspect_ratio=aspect_ratio,
+        )
+        return si, fname, bool(result)
+
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        futures = {pool.submit(_gen_one, t): t for t in to_generate}
+        for fut in as_completed(futures):
+            si, fname, ok = fut.result()
+            if ok:
+                scene_images.setdefault(si, []).append(fname)
 
     return scene_images
+
+
+def _inject_texts_per_scene(d: dict, texts: list[str]) -> None:
+    """C7: 逐场景文案注入 — 第 i 个场景的第一个 text 元素分配 texts[i]。
+
+    - 超 16 字截断
+    - 该场景其余 text 元素 content_text 置 ""
+    - font_size 自适应、最短显示帧数、text_animation 复用旧逻辑
+    """
+    for sc_idx, sc in enumerate(d["scenes"]):
+        scene_text = texts[sc_idx] if sc_idx < len(texts) else ""
+        if scene_text and len(scene_text) > 16:
+            scene_text = scene_text[:16]
+        first_text = True
+        for el in sc["elements"]:
+            if el.get("type") != "text":
+                continue
+            if first_text and scene_text:
+                new_text = scene_text
+                el["content_text"] = new_text
+                typo = el.get("typography", {})
+                n = len(new_text)
+                typo["font_size"] = 6 if n <= 4 else (4.5 if n <= 8 else 3.5)
+                el["typography"] = typo
+                timing = el.get("timing", {})
+                min_frames = max(15, len(new_text) * 3)
+                if timing.get("out_point", 0) - timing.get("in_point", 0) < min_frames:
+                    timing["out_point"] = timing.get("in_point", 0) + min_frames
+                el["timing"] = timing
+                if len(new_text) <= 10:
+                    entrance, split = "typewriter", "char"
+                else:
+                    entrance, split = "blur_in", "word"
+                el["text_animation"] = {
+                    "entrance": entrance, "exit": "fade_up",
+                    "split_mode": split, "direction": "center", "zone": "focus",
+                }
+                first_text = False
+            else:
+                # 该场景其余 text 元素清空（不让旧内容残留）
+                el["content_text"] = ""
 
 
 def _inject_text_and_effects(d, llm_texts, scene_motions):
@@ -1092,13 +1211,16 @@ def _inject_text_and_effects(d, llm_texts, scene_motions):
                 phase_idx[phase] = idx
 
             if el.get("type") == "image":
-                # 混搭 idle 动画，避免同步
-                el["effect_type"] = IDLE_POOL[(sc_idx + el_idx) % len(IDLE_POOL)]
+                # C8: 同一场景所有图片用同一 idle（按 sc_idx 确定），收敛动效池
+                IDLE_POOL_IMG = ["float", "breathe"]
+                el["effect_type"] = IDLE_POOL_IMG[sc_idx % len(IDLE_POOL_IMG)]
                 timing = el.get("timing", {})
                 if not timing.get("entrance"):
+                    # 同一场景统一一种入场（按 sc_idx 选），direction 统一 "bottom"
+                    entrance_types = ["scale", "slide", "fade"]
                     timing["entrance"] = {
-                        "type": ["scale", "slide", "3d", "fade"][el_idx % 4],
-                        "direction": ["left", "right", "top", "bottom"][el_idx % 4],
+                        "type": entrance_types[sc_idx % len(entrance_types)],
+                        "direction": "bottom",
                         "duration": 6,
                     }
                 if not timing.get("exit"):

@@ -16,6 +16,7 @@ import {
   interpolate,
   Img,
   staticFile,
+  Audio,
 } from "remotion";
 import {
   TextOverlayLayer,
@@ -33,11 +34,16 @@ import {
 
 interface Keyframe {
   frame: number;
+  // 旧格式（绝对坐标，ElementRenderer 消费）
   x?: number | null;
   y?: number | null;
   rotation?: number | null;
   scale_x?: number | null;
   scale_y?: number | null;
+  // 新格式（相对关键帧，SceneStage 消费）—— 靠 "dx" 键存在识别
+  dx?: number | null;
+  dy?: number | null;
+  scale?: number | null;
   opacity?: number | null;
   easing?: string;
 }
@@ -563,6 +569,7 @@ interface VideoDecompositionData {
   scenes: VideoSceneData[];
   global_color_palette?: string[];
   style_profile?: StyleProfileData;
+  bgm?: { src: string; volume?: number };
 }
 
 interface StyleProfileData {
@@ -753,6 +760,72 @@ const AnimatedInner: React.FC<{
   );
 };
 
+// ── 相对 motion_path 采样（SceneStage 专用）──────────────────────────────
+// 新格式识别：首个关键帧含 "dx" 键。旧格式（x/y 绝对坐标）返回中性值。
+
+interface RelativeMotionSample {
+  dx: number;
+  dy: number;
+  scale: number;
+  opacity: number;
+}
+
+function sampleRelativeMotion(
+  motionPath: Keyframe[] | undefined,
+  frame: number
+): RelativeMotionSample {
+  const neutral: RelativeMotionSample = { dx: 0, dy: 0, scale: 1, opacity: 1 };
+  if (!motionPath || motionPath.length === 0) return neutral;
+  // 识别新格式：首个关键帧必须有 "dx" 键
+  if (!("dx" in motionPath[0])) return neutral;
+
+  const kfs = motionPath;
+  // 越界处理：取端点值
+  if (frame <= kfs[0].frame) {
+    return {
+      dx: kfs[0].dx ?? 0,
+      dy: kfs[0].dy ?? 0,
+      scale: kfs[0].scale ?? 1,
+      opacity: kfs[0].opacity ?? 1,
+    };
+  }
+  if (frame >= kfs[kfs.length - 1].frame) {
+    const last = kfs[kfs.length - 1];
+    return {
+      dx: last.dx ?? 0,
+      dy: last.dy ?? 0,
+      scale: last.scale ?? 1,
+      opacity: last.opacity ?? 1,
+    };
+  }
+
+  // 找包围关键帧
+  let left = kfs[0];
+  let right = kfs[1];
+  for (let i = 0; i < kfs.length - 1; i++) {
+    if (kfs[i].frame <= frame && kfs[i + 1].frame >= frame) {
+      left = kfs[i];
+      right = kfs[i + 1];
+      break;
+    }
+  }
+
+  const span = right.frame - left.frame;
+  const rawT = span <= 0 ? 1 : (frame - left.frame) / span;
+  // easing 取左关键帧的，默认 ease-out
+  const t = applyEasing(rawT, left.easing || "ease-out");
+
+  const lerp = (a: number | null | undefined, b: number | null | undefined, fallback: number) =>
+    (a ?? fallback) + ((b ?? fallback) - (a ?? fallback)) * t;
+
+  return {
+    dx: lerp(left.dx, right.dx, 0),
+    dy: lerp(left.dy, right.dy, 0),
+    scale: lerp(left.scale, right.scale, 1),
+    opacity: lerp(left.opacity, right.opacity, 1),
+  };
+}
+
 // ── Stage 模式渲染（绝对定位，放射/散开）──────────────────────────────────
 
 const SceneStage: React.FC<{
@@ -779,16 +852,20 @@ const SceneStage: React.FC<{
         const { spatial } = el;
         const rotation = spatial.rotation || 0;
 
+        // 相对 motion_path：dx/dy 是画布百分比偏移，scale 是倍数，opacity 0~1
+        const m = sampleRelativeMotion(el.motion_path, localFrame);
+
         return (
           <div
             key={el.id}
             style={{
               position: "absolute",
-              left: `${spatial.x}%`,
-              top: `${spatial.y}%`,
+              left: `${spatial.x + m.dx}%`,
+              top: `${spatial.y + m.dy}%`,
               width: `${spatial.width}%`,
               height: `${spatial.height}%`,
-              transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
+              transform: `translate(-50%, -50%) rotate(${rotation}deg) scale(${m.scale})`,
+              opacity: m.opacity,
               overflow: "hidden",
               borderRadius: 12,
               boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
@@ -963,19 +1040,37 @@ export const MultiSceneVideo: React.FC<{ decomposition: VideoDecompositionData }
     return <AbsoluteFill style={{ background: "#000" }} />;
   }
 
-  // 转场 fade
-  const TRANSITION_FRAMES = 15;
+  // 转场 fade — 新逻辑：按 entrance_transition / transition_out 类型决定帧数
   const sceneDur = currentScene.duration_frames;
-  let opacity = 1;
+  const entranceType = currentScene.entrance_transition?.type;
+  const exitType = currentScene.transition_out?.type;
 
-  if (sceneLocalFrame < TRANSITION_FRAMES) {
-    opacity = sceneLocalFrame / TRANSITION_FRAMES;
+  // 淡入帧数：仅首场景(8帧) 或 entrance_transition.type==="fade"(10帧)；其余 cut→0
+  const fadeInFrames =
+    currentSceneIdx === 0
+      ? 8
+      : entranceType === "fade"
+      ? 10
+      : 0;
+
+  // 淡出帧数：最后场景(10帧) 或 transition_out.type==="fade"(10帧)
+  //            type==="slide" 暂按 6 帧淡处理 (TODO: 真 slide 动画)
+  //            type==="cut" 0 帧
+  const fadeOutFrames =
+    currentSceneIdx === scenes.length - 1
+      ? 10
+      : exitType === "fade"
+      ? 10
+      : exitType === "slide"
+      ? 6 // TODO: 实现真正的 slide 转场
+      : 0; // cut → 不淡
+
+  let opacity = 1;
+  if (fadeInFrames > 0 && sceneLocalFrame < fadeInFrames) {
+    opacity = sceneLocalFrame / fadeInFrames;
   }
-  if (sceneLocalFrame > sceneDur - TRANSITION_FRAMES) {
-    opacity = (sceneDur - sceneLocalFrame) / TRANSITION_FRAMES;
-  }
-  if (currentScene.transition_out?.type === "cut") {
-    opacity = 1;
+  if (fadeOutFrames > 0 && sceneLocalFrame > sceneDur - fadeOutFrames) {
+    opacity = Math.min(opacity, (sceneDur - sceneLocalFrame) / fadeOutFrames);
   }
 
   // 文字 → 焦点规格（图片数 > 0 时需要 scrim）
@@ -991,19 +1086,44 @@ export const MultiSceneVideo: React.FC<{ decomposition: VideoDecompositionData }
 
   // ── 风格层：从 StyleProfile 读取 ──
   const sp = decomposition.style_profile;
-  const cssFilter = sp?.grade
-    ? [
-        sp.grade.brightness && sp.grade.brightness !== 1 ? `brightness(${sp.grade.brightness})` : "",
-        sp.grade.contrast && sp.grade.contrast !== 1 ? `contrast(${sp.grade.contrast})` : "",
-        sp.grade.saturate && sp.grade.saturate !== 1 ? `saturate(${sp.grade.saturate})` : "",
-        sp.grade.hue_rotate && sp.grade.hue_rotate !== 0 ? `hue-rotate(${sp.grade.hue_rotate}deg)` : "",
-      ]
-        .filter(Boolean)
-        .join(" ")
-    : "";
+
+  // CSS filter 防御钳制：grade 值应≈1.0 倍数语义，但旧 JSON 可能有 0.08/0.28 脏值
+  // 钳制到 [0.85, 1.2]；若 ≈1（±0.02）则跳过该项
+  const grade = sp?.grade || {};
+  const clampGrade = (val: number | string | undefined): number | null => {
+    if (val == null) return null;
+    const n = typeof val === "string" ? parseFloat(val) : val;
+    if (isNaN(n)) return null;
+    // 忽略 measured_* 字段（由调用方按键过滤，这里只处理数值）
+    const clamped = Math.max(0.85, Math.min(1.2, n));
+    if (Math.abs(clamped - 1) <= 0.02) return null; // ≈1 跳过
+    return clamped;
+  };
+  const filterParts: string[] = [];
+  const gradeB = clampGrade(grade["brightness"] as number | undefined);
+  if (gradeB !== null) filterParts.push(`brightness(${gradeB})`);
+  const gradeC = clampGrade(grade["contrast"] as number | undefined);
+  if (gradeC !== null) filterParts.push(`contrast(${gradeC})`);
+  const gradeS = clampGrade(grade["saturate"] as number | undefined);
+  if (gradeS !== null) filterParts.push(`saturate(${gradeS})`);
+  // hue_rotate 是度数，不做倍数钳制，直接透传（若存在）
+  if (typeof grade["hue_rotate"] === "number" && grade["hue_rotate"] !== 0) {
+    filterParts.push(`hue-rotate(${grade["hue_rotate"]}deg)`);
+  }
+  const cssFilter = filterParts.join(" ");
 
   const bgColor = sp?.palette?.bg_color || currentScene.background_color || "#0b1020";
   const bgGradient = sp?.palette?.bg_gradient || currentScene.background_gradient || "";
+
+  // BGM 淡出：结尾 1 秒(fps 帧)线性淡出至 0
+  const totalFrames = decomposition.total_frames;
+  const bgmVolume = decomposition.bgm
+    ? (decomposition.bgm.volume ?? 0.22) *
+      interpolate(frame, [totalFrames - fps, totalFrames], [1, 0], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      })
+    : 0;
 
   return (
     <AbsoluteFill
@@ -1012,6 +1132,15 @@ export const MultiSceneVideo: React.FC<{ decomposition: VideoDecompositionData }
         background: bgGradient || bgColor,
       }}
     >
+      {/* BGM 背景音乐：loop 全程，结尾 1s 淡出 */}
+      {decomposition.bgm?.src ? (
+        <Audio
+          src={staticFile(decomposition.bgm.src)}
+          loop
+          volume={bgmVolume}
+        />
+      ) : null}
+
       {/* z:0 — 内容层（Grid/Stage 图片）+ 调色 CSS filter */}
       <AbsoluteFill style={{ filter: cssFilter || undefined }}>
         {isStage ? (

@@ -101,6 +101,50 @@ class VideoDecomposition:
 
 # ── Step 1: Shot 检测 ─────────────────────────────────────────────────────
 
+def _merge_short_shots(shots: list[dict], min_seconds: float = 1.5) -> list[dict]:
+    """D1: 合并碎场景。把持续时长 < min_seconds 的 shot 并入前一个（第一个则并入后一个）。
+
+    循环直到无碎片或只剩 1 个，然后重排 index。总时长不变。
+    """
+    if len(shots) <= 1:
+        return shots
+
+    changed = True
+    while changed:
+        changed = False
+        if len(shots) <= 1:
+            break
+        new_shots: list[dict] = []
+        i = 0
+        while i < len(shots):
+            s = shots[i]
+            dur = s["end_time"] - s["start_time"]
+            if dur < min_seconds:
+                if new_shots:
+                    # 并入前一个：延伸 end
+                    new_shots[-1]["end_frame"] = s["end_frame"]
+                    new_shots[-1]["end_time"] = s["end_time"]
+                elif i + 1 < len(shots):
+                    # 第一个碎片：并入后一个
+                    shots[i + 1]["start_frame"] = s["start_frame"]
+                    shots[i + 1]["start_time"] = s["start_time"]
+                    i += 1
+                    changed = True
+                    continue
+                else:
+                    new_shots.append(s)
+                changed = True
+            else:
+                new_shots.append(s)
+            i += 1
+        shots = new_shots
+
+    # 重排 index
+    for idx, s in enumerate(shots):
+        s["index"] = idx
+    return shots
+
+
 def detect_shots(video_path: str) -> list[dict]:
     """用 PySceneDetect 检测 shot 边界。返回 [{start_frame, end_frame, start_time, end_time}]"""
     try:
@@ -122,6 +166,8 @@ def detect_shots(video_path: str) -> list[dict]:
                 "end_time": end.get_seconds(),
             })
         logger.info(f"Shot 检测: {len(shots)} 个 shot")
+        shots = _merge_short_shots(shots)
+        logger.info(f"Shot 合并后: {len(shots)} 个 shot")
         return shots
     except Exception as e:
         logger.warning(f"PySceneDetect 失败: {e}, 用固定切分")
@@ -141,6 +187,8 @@ def detect_shots(video_path: str) -> list[dict]:
                 "end_time": min(i + step, total) / fps,
             })
         logger.info(f"固定切分: {len(shots)} 个 shot")
+        shots = _merge_short_shots(shots)
+        logger.info(f"Shot 合并后: {len(shots)} 个 shot")
         return shots
 
 
@@ -994,13 +1042,6 @@ def _select_layout_template(elements: list) -> str:
     if n_images == 0 and n_texts > 0:
         return "centered_hero"
     return "centered_hero"
-    if n_images == 1 and n_texts <= 1:
-        return "single-focus"   # 1 图 + 1 文字
-    if n_images == 1 and n_texts > 1:
-        return "split-LR"       # 1 图 + 2 文字
-    if n_images == 0 and n_texts > 0:
-        return "centered-hero"  # 纯文字
-    return "single-focus"
 
 
 def _clamp_to_safe_zone(x: float, y: float, w: float, h: float) -> tuple:
@@ -1071,16 +1112,23 @@ def _apply_parametric_layout(elements: list, start_f: int, end_f: int, fps: floa
         el.timing.out_point = e
 
     def _assign_animations(imgs, start, stagger_base=3):
+        # D2: 同屏统一一种入场 + 一种 idle，按 start_f 确定性选择，避免同屏打架
+        ENTRANCE_UNIFIED = ["scale", "slide", "fade", "mask_reveal"]
+        IDLE_UNIFIED = ["float", "breathe"]
+        unified_entrance = ENTRANCE_UNIFIED[start_f % len(ENTRANCE_UNIFIED)]
+        # slide/mask_reveal 用 "bottom"，scale/fade 用 "center"
+        unified_dir = "bottom" if unified_entrance in ("slide", "mask_reveal") else "center"
+        unified_idle = IDLE_UNIFIED[start_f % len(IDLE_UNIFIED)]
+        stagger = min(5, max(2, stagger_base))
         for i, img in enumerate(imgs):
             img.timing.entrance = AnimationSpec(
-                type=ENTRANCE_TYPES[i % len(ENTRANCE_TYPES)],
-                direction=["left", "right", "top", "bottom", "center"][i % 5],
+                type=unified_entrance,
+                direction=unified_dir,
                 duration=8,
             )
             img.timing.exit = AnimationSpec(type="fade", duration=4, start_value=1.0, end_value=0.0)
-            img.effect_type = IDLE_EFFECTS[i % len(IDLE_EFFECTS)]
-            img.spatial.rotation = (i * 7 - len(imgs) * 3.5) % 30 - 15
-            stagger = min(5, max(2, stagger_base))
+            img.effect_type = unified_idle
+            img.spatial.rotation = 0  # 旋转一律 0（stack 家族的扇形旋转在其自己分支处理）
             _set_timing(img, start + i * stagger, end_f)
 
     def _center_texts(txts, start):
@@ -1946,53 +1994,25 @@ def decomposition_to_orchestrator_template(
         else:
             return "build"
 
-    # 收集可用图片（全部有路径的）
-    all_image_srcs = []
-    for sc in decomp.scenes:
-        for el in sc.elements:
-            if el.type == "image" and getattr(el, 'content_src', ''):
-                src = os.path.basename(el.content_src)
-                if src not in all_image_srcs:
-                    all_image_srcs.append(src)
-
-    # 按 phase 聚合 beats — 只传结构骨架
-    phase_beats: dict[str, dict] = {}
-    img_cursor = 0  # 轮流分配图片
+    # D4: 每个场景一个 beat（不压缩到 3 个 phase，避免 LLM 只产几条文案）
+    beats: list[dict] = []
     for i, sc in enumerate(decomp.scenes):
         phase = _phase(i)
-        if phase not in phase_beats:
-            phase_beats[phase] = {
-                "id": phase,
-                "role": phase,
-                "layout": sc.vlm_layout or sc.layout_type or "grid",
-                "duration_s": 0.0,
-                "transition_in": "cut",
-                "pattern": "",
-                "components": [],
-            }
-        phase_beats[phase]["duration_s"] += round(sc.duration_frames / 30, 2)
-
-        # 添加 components（限总数，只传结构不传内容）
-        comps = phase_beats[phase]["components"]
-        if len(comps) >= max_components_per_beat:
-            continue
-
-        # 图片: 轮流分配，只传路径
-        n_img = sum(1 for e in sc.elements if e.type == "image")
-        if n_img > 0 and len(comps) < max_components_per_beat and img_cursor < len(all_image_srcs):
-            comps.append({
-                "ref": "FloatingMockup",
-                "role": "hero",
-                "position": "center",
-                "props_hint": {"src": all_image_srcs[img_cursor]},
-            })
-            img_cursor += 1
-
-        # 不传任何文字内容 — LLM 根据主题自行生成
-
-    beats = list(phase_beats.values())
-    for i, b in enumerate(beats):
-        b["beat"] = i
+        duration_s = max(0.8, round(sc.duration_frames / max(decomp.fps or 30, 1), 2))
+        beat = {
+            "id": f"s{i}",
+            "beat": i,
+            "role": phase,
+            "layout": sc.vlm_layout or sc.layout_type or "grid",
+            "duration_s": duration_s,
+            "transition_in": "cut",
+            "pattern": "",
+            # 只提供 KineticText 文字槽位，下游风格迁移只取文字
+            "components": [
+                {"ref": "KineticText", "role": "hero_text", "position": "center"},
+            ],
+        }
+        beats.append(beat)
 
     return {
         "template_id": f"decomp_{int(__import__('time').time())}",
@@ -2020,71 +2040,78 @@ def generate_motion_paths_for_decomp(d: dict, scene_motions: list[dict], fps: in
     """
     import math
 
-    # 动画类型 → 运动生成函数
+    # D3: 相对关键帧生成器（契约 2）
+    # 格式: {"frame": int, "dx": float, "dy": float, "scale": float, "opacity": float, "easing": str}
+    # dx/dy = 画布百分比偏移（振幅 ≤8），scale = 缩放倍数（0.9~1.1），opacity 0~1
+    # 渲染端靠 "dx" 键名识别新格式。
+
+    def _kf(frame: int, dx: float = 0.0, dy: float = 0.0, scale: float = 1.0,
+            opacity: float = 1.0, easing: str = "ease-out") -> dict:
+        """构造标准相对关键帧（含全部 6 个必要键）。"""
+        return {"frame": frame, "dx": round(dx, 3), "dy": round(dy, 3),
+                "scale": round(scale, 3), "opacity": round(opacity, 3), "easing": easing}
+
     def _gen_pan(duration_f: int, direction: str = "right") -> list[dict]:
-        """平移：元素从一侧滑入"""
-        start = {"left": -20, "right": 20, "top": 0, "bottom": 0}
-        end = {"left": 0, "right": 0, "top": 0, "bottom": 0}
+        """平移：dx 从 ±6 收敛到 0（画布百分比偏移）。"""
+        amp = 6.0
+        start_dx = {"right": amp, "left": -amp, "top": 0.0, "bottom": 0.0}.get(direction, amp)
+        start_dy = {"top": -amp, "bottom": amp}.get(direction, 0.0) if direction in ("top", "bottom") else 0.0
         kfs = []
         for ratio in [0, 0.3, 0.7, 1.0]:
             frame = int(duration_f * ratio)
-            x = start.get(direction, 0) * (1 - ratio)
-            y = (start.get("top", 0) if direction == "top" else start.get("bottom", 0)) * (1 - ratio)
-            kfs.append({"frame": frame, "x": 50 + x, "y": 50 + y, "rotation": 0,
-                        "scale_x": 1.0, "scale_y": 1.0, "opacity": 1.0, "easing": "ease-out"})
+            dx = start_dx * (1 - ratio)
+            dy = start_dy * (1 - ratio)
+            kfs.append(_kf(frame, dx=dx, dy=dy))
         return kfs
 
     def _gen_scale(duration_f: int) -> list[dict]:
-        """缩放：从小到大"""
+        """缩放：scale 0.94→1.0 配 opacity 0→1。"""
         kfs = []
         for ratio in [0, 0.2, 0.5, 1.0]:
             frame = int(duration_f * ratio)
-            s = 0.3 + 0.7 * ratio  # 0.3 → 1.0
-            kfs.append({"frame": frame, "x": 50, "y": 50, "rotation": 0,
-                        "scale_x": s, "scale_y": s, "opacity": ratio, "easing": "ease-out"})
+            s = 0.94 + 0.06 * ratio
+            kfs.append(_kf(frame, scale=s, opacity=ratio))
         return kfs
 
     def _gen_fade(duration_f: int) -> list[dict]:
-        """淡入：opacity 0 → 1"""
+        """淡入：仅 opacity 0→1，位置/缩放不变。"""
         kfs = []
         for ratio in [0, 0.2, 0.5, 1.0]:
             frame = int(duration_f * ratio)
-            kfs.append({"frame": frame, "x": 50, "y": 50, "rotation": 0,
-                        "scale_x": 1.0, "scale_y": 1.0, "opacity": ratio, "easing": "ease-out"})
+            kfs.append(_kf(frame, opacity=ratio))
         return kfs
 
     def _gen_float(duration_f: int) -> list[dict]:
-        """飘浮：正弦上下浮动"""
+        """飘浮：dy 正弦 ±1.2（8 个关键帧）。"""
         kfs = []
         for i in range(8):
             ratio = i / 7
             frame = int(duration_f * ratio)
-            y_offset = 3 * math.sin(ratio * math.pi * 2)
-            kfs.append({"frame": frame, "x": 50, "y": 50 + y_offset, "rotation": 0,
-                        "scale_x": 1.0, "scale_y": 1.0, "opacity": 1.0, "easing": "linear"})
+            dy = 1.2 * math.sin(ratio * math.pi * 2)
+            kfs.append(_kf(frame, dy=dy, easing="linear"))
         return kfs
 
     def _gen_elastic(duration_f: int) -> list[dict]:
-        """弹性：缩放带回弹"""
+        """弹性：scale 1±0.06 衰减。"""
         kfs = []
         for i in range(8):
             ratio = i / 7
             frame = int(duration_f * ratio)
-            s = 1.0 + 0.15 * math.sin(ratio * math.pi * 3) * math.exp(-ratio * 2)
-            kfs.append({"frame": frame, "x": 50, "y": 50, "rotation": 0,
-                        "scale_x": s, "scale_y": s, "opacity": 1.0, "easing": "ease-out"})
+            s = 1.0 + 0.06 * math.sin(ratio * math.pi * 3) * math.exp(-ratio * 2)
+            s = round(max(0.9, min(1.1, s)), 3)
+            kfs.append(_kf(frame, scale=s))
         return kfs
 
     def _gen_cascade(duration_f: int, n_elements: int, el_idx: int) -> list[dict]:
-        """级联：元素依次入场"""
-        delay_ratio = el_idx / max(n_elements, 1) * 0.3  # 前 30% 时间依次入场
+        """级联：按 el_idx 延迟的 opacity 0→1 配 dy 4→0。"""
+        delay_ratio = el_idx / max(n_elements, 1) * 0.3
         kfs = []
         for ratio in [0, delay_ratio, delay_ratio + 0.1, 1.0]:
-            frame = int(duration_f * min(ratio, 1.0))
-            opacity = 0 if ratio < delay_ratio else min(1.0, (ratio - delay_ratio) / 0.1)
-            y_offset = 10 * (1 - opacity)
-            kfs.append({"frame": frame, "x": 50, "y": 50 + y_offset, "rotation": 0,
-                        "scale_x": 1.0, "scale_y": 1.0, "opacity": opacity, "easing": "ease-out"})
+            ratio = min(ratio, 1.0)
+            frame = int(duration_f * ratio)
+            opacity = 0.0 if ratio < delay_ratio else min(1.0, (ratio - delay_ratio) / max(0.1, 0.001))
+            dy = 4.0 * (1 - opacity)
+            kfs.append(_kf(frame, dy=dy, opacity=opacity))
         return kfs
 
     # VLM 描述 → 动画类型映射

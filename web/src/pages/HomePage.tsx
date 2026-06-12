@@ -469,6 +469,7 @@ export default function HomePage() {
           width: result.decomposition.canvas_width || 1280,
           height: result.decomposition.canvas_height || 720,
           durationInFrames: result.decomposition.total_frames || 900,
+          fps: result.decomposition.fps || 30,
         }),
       });
       const renderResult = await renderResp.json();

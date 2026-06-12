@@ -298,12 +298,13 @@ app.post('/api/render_script', async (req, res) => {
 // ─── Style Migration endpoint ──────────────────────────────────────────────
 
 app.post('/api/render_scene', async (req, res) => {
-  const { composition, props, width, height, durationInFrames } = req.body as {
+  const { composition, props, width, height, durationInFrames, fps } = req.body as {
     composition: string;
     props: Record<string, unknown>;
     width: number;
     height: number;
     durationInFrames: number;
+    fps?: number;
   };
 
   if (!composition || !props) {
@@ -329,7 +330,7 @@ app.post('/api/render_scene', async (req, res) => {
       'remotion', 'render',
       entryPoint, composition, outputFile,
       `--props=${propsFile}`,
-      '--fps=30',
+      `--fps=${Number(fps) || 30}`,
       `--width=${w}`,
       `--height=${h}`,
       `--duration-in-frames=${dur}`,

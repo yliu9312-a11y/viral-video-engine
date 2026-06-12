@@ -849,16 +849,30 @@ def extract_style_profile(video_path: str, frame=None) -> StyleProfile:
         profile.typography["text_color"] = best_text
 
     # 亮度/对比/饱和 → grade
+    # 注意：测量值（0~1 归一化）≠ CSS filter 倍数（1.0 = 不变）。
+    # 测量值保留在 measured_* 字段以供溯源；grade 中存 CSS filter 语义倍数。
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    brightness = float(np.mean(gray)) / 255.0
-    contrast = float(np.std(gray)) / 128.0
+    measured_brightness = float(np.mean(gray)) / 255.0
+    measured_contrast = float(np.std(gray)) / 128.0
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    saturation = float(np.mean(hsv[:, :, 1])) / 255.0
+    measured_saturation = float(np.mean(hsv[:, :, 1])) / 255.0
 
-    profile.grade["brightness"] = round(brightness, 2)
-    profile.grade["contrast"] = round(min(contrast, 2.0), 2)
-    profile.grade["saturate"] = round(saturation, 2)
-    profile.grade["mood"] = "dark" if brightness < 0.4 else "light"
+    # 保留溯源字段
+    profile.grade["measured_brightness"] = round(measured_brightness, 3)
+    profile.grade["measured_contrast"] = round(measured_contrast, 3)
+    profile.grade["measured_saturation"] = round(measured_saturation, 3)
+
+    # CSS filter 倍数：brightness 固定 1.0（避免全黑）
+    profile.grade["brightness"] = 1.0
+    # contrast: 暗视频稍微拉一点对比，1.05；其他不变
+    is_dark = measured_brightness < 0.4
+    profile.grade["contrast"] = 1.05 if is_dark else 1.0
+    # saturate: 测量饱和度温和线性映射，clamp 到 [0.9, 1.15]
+    # 低饱和（≈0）→ 0.9；高饱和（≈1）→ 1.15
+    raw_saturate = 0.9 + measured_saturation * 0.25
+    profile.grade["saturate"] = round(max(0.9, min(1.15, raw_saturate)), 3)
+    profile.grade["hue_rotate"] = 0
+    profile.grade["mood"] = "dark" if measured_brightness < 0.4 else "light"
 
     # 暖冷判断：红蓝通道比
     b_mean = float(np.mean(frame[:, :, 0]))

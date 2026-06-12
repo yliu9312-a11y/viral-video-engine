@@ -632,11 +632,12 @@ def validate_and_fix_decomposition(decomp: dict) -> tuple[dict, list[QAIssue]]:
     """校验 + 自动修复多场景分解。"""
     issues = validate_decomposition(decomp)
 
-    # 自动修复空文字
+    # 自动修复空文字：直接删除 content_text 为空白的 text 元素（避免渲染出破折号）
     for sc in decomp.get("scenes", []):
-        for e in sc.get("elements", []):
-            if e.get("type") == "text" and not e.get("content_text", "").strip():
-                e["content_text"] = "—"
+        sc["elements"] = [
+            e for e in sc.get("elements", [])
+            if not (e.get("type") == "text" and not e.get("content_text", "").strip())
+        ]
 
     # 自动修复阅读时间不足
     for sc in decomp.get("scenes", []):
