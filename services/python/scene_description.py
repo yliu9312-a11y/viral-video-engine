@@ -15,6 +15,7 @@ import os
 from dataclasses import dataclass, field
 
 import httpx
+import requests as _requests
 
 logger = logging.getLogger(__name__)
 
@@ -335,23 +336,25 @@ class StyleProfile:
 
 # ── VLM 提取 ──────────────────────────────────────────────────────────────
 
-def _vlm_call(frames_b64: list[str], prompt: str, max_tokens: int = 3000, retries: int = 3) -> str | None:
+def _vlm_call(frames_b64: list[str], prompt: str, max_tokens: int = 3000, retries: int = 2) -> str | None:
     """调用 VLM 分析帧。
 
     可靠性保障:
     - 图片压缩到 640px 宽（减少 payload → 减少超时）
-    - 3 次重试 + 指数退避（1s, 2s, 4s）
-    - 连接复用（httpx.Client）
+    - 2 次重试 + 指数退避
+    - 硬超时: ThreadPoolExecutor + future.result(timeout) 兜底
+      （httpx/requests 在 TCP ESTABLISHED 但服务端不响应时 timeout 不生效）
     """
     import time as _time
     import base64 as _base64
+    from concurrent.futures import ThreadPoolExecutor, TimeoutError as _FuturesTimeout
 
     api_key, api_url, vlm_model = _get_mimo_env()
     if not api_key:
         logger.warning("MIMO_API_KEY 未设置，跳过 VLM 调用")
         return None
 
-    # 压缩图片：缩放到 640px 宽，JPEG quality 70 → payload 减少 ~70%
+    # 压缩图片：缩放到 480px 宽，JPEG quality 60 → payload 减少 ~85%
     compressed_b64 = []
     for b64 in frames_b64:
         try:
@@ -361,10 +364,10 @@ def _vlm_call(frames_b64: list[str], prompt: str, max_tokens: int = 3000, retrie
             frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
             if frame is not None:
                 h, w = frame.shape[:2]
-                if w > 640:
-                    scale = 640 / w
-                    frame = cv2.resize(frame, (640, int(h * scale)))
-                _, buf = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 70])
+                if w > 480:
+                    scale = 480 / w
+                    frame = cv2.resize(frame, (480, int(h * scale)))
+                _, buf = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 60])
                 compressed_b64.append(_base64.b64encode(buf).decode())
             else:
                 compressed_b64.append(b64)
@@ -376,20 +379,29 @@ def _vlm_call(frames_b64: list[str], prompt: str, max_tokens: int = 3000, retrie
         content.append({"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{b64}"}})
     content.append({"type": "text", "text": prompt})
 
-    # 重试 + 指数退避
+    def _do_request():
+        """单次请求（在线程中运行）。"""
+        return _requests.post(
+            api_url,
+            json={
+                "model": vlm_model,
+                "messages": [{"role": "user", "content": content}],
+                "max_tokens": max_tokens,
+                "temperature": 0.1,
+            },
+            headers={"Authorization": f"Bearer {api_key}"},
+            timeout=(10, 60),  # (connect, read)
+        )
+
+    HARD_TIMEOUT = 75  # 硬超时秒数 — 比 read timeout 稍长
+
     for attempt in range(retries):
         try:
-            resp = httpx.post(
-                api_url,
-                json={
-                    "model": vlm_model,
-                    "messages": [{"role": "user", "content": content}],
-                    "max_tokens": max_tokens,
-                    "temperature": 0.1,
-                },
-                headers={"Authorization": f"Bearer {api_key}"},
-                timeout=120.0,
-            )
+            # 用 ThreadPoolExecutor + future.result(timeout) 做硬超时
+            with ThreadPoolExecutor(max_workers=1) as pool:
+                future = pool.submit(_do_request)
+                resp = future.result(timeout=HARD_TIMEOUT)
+
             if resp.status_code == 429:
                 wait = 2 ** (attempt + 1)
                 logger.info(f"VLM 限流，等待 {wait}s 重试 ({attempt+1}/{retries})")
@@ -406,10 +418,16 @@ def _vlm_call(frames_b64: list[str], prompt: str, max_tokens: int = 3000, retrie
             if not text:
                 text = msg.get("reasoning_content", "").strip()
             return text if text else None
-        except (httpx.TimeoutException, httpx.ConnectError) as e:
+        except _FuturesTimeout:
+            logger.warning(f"VLM 硬超时 ({HARD_TIMEOUT}s), attempt {attempt+1}/{retries}")
+            if attempt < retries - 1:
+                continue
+            return None
+        except (_requests.Timeout, _requests.ConnectionError) as e:
             wait = 2 ** (attempt + 1)
-            logger.warning(f"VLM 超时/连接失败 ({attempt+1}/{retries}): {e}, 等待 {wait}s")
-            _time.sleep(wait)
+            logger.warning(f"VLM 超时/连接失败 ({attempt+1}/{retries}): {e}")
+            if attempt < retries - 1:
+                _time.sleep(wait)
         except Exception as e:
             logger.warning(f"VLM 异常: {e}")
             return None

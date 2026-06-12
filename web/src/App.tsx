@@ -39,8 +39,12 @@ function App() {
       </nav>
 
       <div style={{ animation: 'fadeInUp 0.3s ease-out' }}>
-        {page === 'pipeline' && <HomePage />}
-        {page === 'editor' && <EditorPage onBack={() => setPage('pipeline')} />}
+        <div style={{ display: page === 'pipeline' ? 'block' : 'none' }}>
+          <HomePage />
+        </div>
+        <div style={{ display: page === 'editor' ? 'block' : 'none' }}>
+          <EditorPage onBack={() => setPage('pipeline')} />
+        </div>
       </div>
     </div>
   );

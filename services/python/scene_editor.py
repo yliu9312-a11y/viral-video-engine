@@ -300,6 +300,83 @@ def generate_diff(old_spec: dict, new_spec: dict) -> list[str]:
 
 
 # ═══════════════════════════════════════════════════════════
+# decomposition → VideoSpec 转换
+# ═══════════════════════════════════════════════════════════
+
+def _scenes_to_shots(spec: dict) -> list[dict]:
+    """将 decomposition 的 scenes 转换为 VideoSpec 的 shots 格式。"""
+    fps = spec.get("fps", 30)
+    shots = []
+    for sc in spec.get("scenes", []):
+        # 从 elements 中提取文字和图片
+        texts = []
+        images = []
+        for el in sc.get("elements", []):
+            if el.get("type") == "text" or el.get("content_text"):
+                texts.append(el.get("content_text", el.get("text", "")))
+            if el.get("type") == "image" or el.get("content_src"):
+                images.append(el.get("content_src", ""))
+
+        # 确定组件类型
+        role = sc.get("scene_role", sc.get("role", "build"))
+        if role in ("hook", "opening"):
+            component = "HookBeat"
+        elif role in ("cta", "payoff", "closing"):
+            component = "ClosingBeat"
+        else:
+            component = "KineticText"
+
+        # 如果有图片，用 ProductShowcase
+        if images:
+            component = "ProductShowcase"
+
+        duration_frames = sc.get("duration_frames", 90)
+        shot = {
+            "component": component,
+            "role": role,
+            "duration": duration_frames,
+            "duration_s": round(duration_frames / fps, 1),
+            "props": {
+                "text": texts[0] if texts else "",
+                "image_src": images[0] if images else "",
+            },
+        }
+        shots.append(shot)
+    return shots
+
+
+def _sync_shots_to_scenes(edited_spec: dict, original_spec: dict):
+    """把 LLM 编辑后的 shots 改动同步回 decomposition 的 scenes。"""
+    shots = edited_spec.get("shots", [])
+    scenes = original_spec.get("scenes", [])
+    for i, shot in enumerate(shots):
+        if i >= len(scenes):
+            break
+        sc = scenes[i]
+        # 同步文字
+        new_text = shot.get("props", {}).get("text", "")
+        if new_text:
+            for el in sc.get("elements", []):
+                if el.get("type") == "text" or el.get("content_text"):
+                    el["content_text"] = new_text
+                    el["text"] = new_text
+                    break
+        # 同步时长
+        new_dur = shot.get("duration", shot.get("duration_s", 0))
+        if isinstance(new_dur, float):
+            new_dur = int(new_dur * original_spec.get("fps", 30))
+        if new_dur > 0:
+            sc["duration_frames"] = new_dur
+    # 重算场景边界
+    frame = 0
+    for sc in scenes:
+        sc["start_frame"] = frame
+        sc["end_frame"] = frame + sc["duration_frames"]
+        frame += sc["duration_frames"]
+    original_spec["total_frames"] = frame
+
+
+# ═══════════════════════════════════════════════════════════
 # 主函数
 # ═══════════════════════════════════════════════════════════
 
@@ -317,6 +394,8 @@ async def edit_scene(spec_path: str, instruction: str) -> dict:
 
     api_key = os.environ.get("MIMO_API_KEY", "")
     api_url = os.environ.get("MIMO_API_URL", "https://token-plan-cn.xiaomimimo.com/v1")
+    # OpenAI 客户端会自动加 /chat/completions，所以要去掉末尾的
+    api_url = api_url.replace("/chat/completions", "")
     model = os.environ.get("MIMO_MODEL", "mimo-v2.5-pro")
 
     if not api_key:
@@ -331,6 +410,10 @@ async def edit_scene(spec_path: str, instruction: str) -> dict:
         spec = json.load(f)
 
     shots = spec.get("shots", [])
+    # 兼容 decomposition 格式（scenes → shots 转换）
+    if not shots and "scenes" in spec:
+        shots = _scenes_to_shots(spec)
+        spec = {**spec, "shots": shots}
     if not shots:
         return {"success": False, "error": "Spec 中没有 shots"}
 
@@ -369,15 +452,25 @@ async def edit_scene(spec_path: str, instruction: str) -> dict:
     # 5. 生成 diff
     diff = generate_diff(spec, new_spec)
 
-    # 6. 保存
+    # 6. 保存 — 如果原始是 decomposition 格式，把 shots 的改动同步回 scenes
     output_dir = spec_file.parent
     clean_stem = spec_file.stem.replace("_edited", "")
     new_spec_path = output_dir / f"{clean_stem}_edited.json"
+
+    # 如果原始 spec 有 scenes（decomposition 格式），同步改动
+    if "scenes" in spec:
+        _sync_shots_to_scenes(new_spec, spec)
+        save_data = spec  # 保存完整的 decomposition（含 scenes）
+        # 同时把 shots 也加进去方便后续编辑
+        save_data["shots"] = new_spec.get("shots", [])
+    else:
+        save_data = new_spec
+
     with open(new_spec_path, "w") as f:
-        json.dump(new_spec, f, ensure_ascii=False, indent=2)
+        json.dump(save_data, f, ensure_ascii=False, indent=2)
 
     # 7. 返回
-    old_total = sum(s.get("duration", 0) for s in spec.get("shots", [])) / 30
+    old_total = sum(s.get("duration_frames", s.get("duration", 0)) for s in spec.get("shots", spec.get("scenes", []))) / 30
     new_total = sum(s.get("duration", 0) for s in new_spec.get("shots", [])) / 30
 
     return {

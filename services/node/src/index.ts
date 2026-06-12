@@ -328,12 +328,13 @@ app.post('/api/render_scene', async (req, res) => {
     execFileSync('npx', [
       'remotion', 'render',
       entryPoint, composition, outputFile,
-      `--props=${JSON.stringify(JSON.stringify(props))}`,
+      `--props=${propsFile}`,
       '--fps=30',
       `--width=${w}`,
       `--height=${h}`,
       `--duration-in-frames=${dur}`,
       '--codec=h264',
+      '--timeout=120000',
     ], {
       stdio: 'pipe',
       cwd: resolve(PROJECT_ROOT, 'web'),
@@ -362,8 +363,13 @@ app.post('/api/style_migrate', async (req, res) => {
   }
 
   try {
-    const data = await pyPost('/style_migrate', { video_path: videoPath, topic });
-    return res.json(data);
+    // style_migrate 需要 15-20 分钟（SAM2 + VLM + Gemini），单独设 30 分钟超时
+    const resp = await axios.post(`${PYTHON_URL}/style_migrate`, { video_path: videoPath, topic }, {
+      timeout: 2_400_000, // 40 min — SAM2 + VLM + Gemini 管线需要 30+ 分钟
+      maxBodyLength: Infinity,
+      maxContentLength: Infinity,
+    });
+    return res.json(resp.data);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     return res.status(502).json({ error: `Failed to reach Python service: ${message}` });

@@ -804,17 +804,18 @@ export const TextOverlayLayer: React.FC<TextOverlayLayerProps> = ({
         pointerEvents: "none",
       }}
     >
-      {/* 焦点区：中心 */}
+      {/* 焦点区：中心（用百分比适配不同画布尺寸） */}
       <div
         style={{
           position: "absolute",
-          left: SAFE_ZONE.left,
-          right: SAFE_ZONE.right,
-          top: SAFE_ZONE.top + 100,
-          bottom: SAFE_ZONE.bottom + 200,
+          left: "5%",
+          right: "5%",
+          top: "10%",
+          bottom: "15%",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          overflow: "hidden",
         }}
       >
         {/* Scrim：图片背景上需要可读性底衬 */}

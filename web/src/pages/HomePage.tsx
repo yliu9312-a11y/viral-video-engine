@@ -440,6 +440,24 @@ export default function HomePage() {
       setMigrateStep("风格迁移完成");
       setMigrateProgress(90);
 
+      // 设置 specPath 以便编辑器可以使用
+      if (result.decomp_path) {
+        setVideoSpecPath(result.decomp_path);
+        // 同时初始化场景卡片数据
+        if (result.decomposition?.scenes) {
+          const shotsList = result.decomposition.scenes.map((s: Record<string, unknown>, i: number) => ({
+            index: i,
+            component: s.elements?.[0]?.type === 'image' ? 'ProductShowcase' : 'KineticText',
+            role: s.scene_role || 'build',
+            duration_s: Math.round((s.duration_frames as number || 0) / 30 * 10) / 10,
+            text: (s.elements as Record<string, unknown>[])?.find((e: Record<string, unknown>) => e.type === 'text')?.content_text || '',
+          }));
+          setSceneBeforeShots(shotsList);
+          setSceneAfterShots([]);
+          setChangedShotIndices(new Set());
+        }
+      }
+
       // Step 3: Render
       setMigrateStep("Remotion 渲染中...");
       const renderResp = await fetch(`${API}/api/render_scene`, {

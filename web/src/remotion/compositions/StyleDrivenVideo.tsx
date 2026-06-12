@@ -716,7 +716,7 @@ const AnimatedInner: React.FC<{
             height: "100%",
             objectFit: "cover",
             objectPosition: "center",
-            borderRadius: 12,
+            borderRadius: 8,
           }}
         />
       ) : element.type === "text" && element.content_text ? (
@@ -834,14 +834,19 @@ const SceneGrid: React.FC<{
   }));
 
   return (
-    <AbsoluteFill
+    <div
       style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
         display: "grid",
         gridTemplateColumns: layout.cols,
         gridTemplateRows: layout.rows,
         gridTemplateAreas: layout.areas,
-        gap: "14px",
-        padding: "56px",
+        gap: "8px",
+        padding: "4%",
         background: scene.background_gradient || scene.background_color || "#0b1020",
         boxSizing: "border-box",
       }}
@@ -863,7 +868,7 @@ const SceneGrid: React.FC<{
               gridArea: el._slot,
               position: "relative",
               overflow: "hidden",
-              borderRadius: 12,
+              borderRadius: 8,
               minWidth: 0,
               minHeight: 0,
             }}
@@ -872,7 +877,7 @@ const SceneGrid: React.FC<{
           </div>
         );
       })}
-    </AbsoluteFill>
+    </div>
   );
 };
 
@@ -896,7 +901,8 @@ function pickTextEntrance(el: SceneElement): TextEntranceType {
 
 /** 将场景文字元素转为 FocusTextSpec 列表 */
 function textElementsToFocusSpecs(
-  elements: SceneElement[]
+  elements: SceneElement[],
+  canvasHeight?: number
 ): FocusTextSpec[] {
   const textEls = elements.filter((el) => el.type === "text" && el.content_text);
 
@@ -914,7 +920,7 @@ function textElementsToFocusSpecs(
       zone: ta.zone || (i === 0 ? "focus" : "focus"),
       style: {
         fontSize: el.typography?.font_size
-          ? el.typography.font_size * 18 // vh → px 近似
+          ? el.typography.font_size * (canvasHeight || 1080) / 60 // vh → px，按画布高度缩放
           : undefined,
         fontWeight: el.typography?.font_weight || undefined,
         color: el.typography?.color || undefined,
@@ -975,7 +981,8 @@ export const MultiSceneVideo: React.FC<{ decomposition: VideoDecompositionData }
   // 文字 → 焦点规格（图片数 > 0 时需要 scrim）
   const hasImages = currentScene.elements.some((el) => el.type === "image" && el.content_src);
   const focusTexts = textElementsToFocusSpecs(
-    currentScene.elements
+    currentScene.elements,
+    decomposition.canvas_height
   );
 
   // 根据模式选择渲染器

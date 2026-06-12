@@ -759,6 +759,7 @@ class StyleMigrateRequest(BaseModel):
 
 def _style_migrate_blocking(video_path: str, topic: str) -> dict:
     """同步阻塞版本的风格迁移，供 run_in_executor 调用。"""
+    import time as _time
     from scene_decomposer import (
         decompose_video, decomposition_to_dict, decomposition_from_dict,
         decomposition_to_orchestrator_template, generate_motion_paths_for_decomp,
@@ -768,25 +769,26 @@ def _style_migrate_blocking(video_path: str, topic: str) -> dict:
     job_id = uuid.uuid4().hex[:8]
     output_dir = OUTPUT_BASE / job_id
     output_dir.mkdir(parents=True, exist_ok=True)
+    t_start = _time.time()
 
     print(f"[style_migrate] job={job_id} 开始分解...", flush=True)
 
     # 1. 分解
     decomp = decompose_video(video_path, output_dir=str(output_dir))
     d = decomposition_to_dict(decomp)
-    print(f"[style_migrate] 分解完成: {len(d.get('scenes', []))} 场景", flush=True)
+    print(f"[style_migrate] 分解完成: {len(d.get('scenes', []))} 场景 ({_time.time()-t_start:.0f}s)", flush=True)
 
     # 2. StyleProfile
     style_profile = extract_style_profile(video_path)
-    print(f"[style_migrate] 风格: {style_profile.style_family}", flush=True)
+    print(f"[style_migrate] 风格: {style_profile.style_family} ({_time.time()-t_start:.0f}s)", flush=True)
 
     # 3. VLM 运动分析
     scene_motions = _vlm_analyze_motion(video_path, d["scenes"])
-    print(f"[style_migrate] 运动分析完成", flush=True)
+    print(f"[style_migrate] 运动分析完成 ({_time.time()-t_start:.0f}s)", flush=True)
 
     # 4. Gemini 图片生成（注入风格）
     scene_images = _generate_scene_images(topic, d["scenes"], str(output_dir), style_profile)
-    print(f"[style_migrate] 图片生成完成", flush=True)
+    print(f"[style_migrate] 图片生成完成 ({_time.time()-t_start:.0f}s)", flush=True)
 
     # 替换图片路径
     for i, sc in enumerate(d["scenes"]):
@@ -805,6 +807,30 @@ def _style_migrate_blocking(video_path: str, topic: str) -> dict:
 
     # 6. 注入文字 + 动效（先用默认文字，LLM 编排在 async 层做）
     _inject_text_and_effects(d, {}, scene_motions)
+
+    # 6.5 质量控制（接入主管线的校验体系）
+    from scene_decomposer import _clamp_to_safe_zone, SAFE_ZONE
+    for sc in d["scenes"]:
+        for el in sc.get("elements", []):
+            sp = el.get("spatial", {})
+            x = sp.get("x", 50)
+            y = sp.get("y", 50)
+            w = sp.get("width", 30)
+            h = sp.get("height", 30)
+            x, y = _clamp_to_safe_zone(x, y, w, h)
+            sp["x"] = x
+            sp["y"] = y
+        # 限制同屏元素数
+        MAX_EL = 4
+        visible = [el for el in sc["elements"] if el.get("content_src") or el.get("content_text")]
+        if len(visible) > MAX_EL:
+            sc["elements"] = visible[:MAX_EL]
+
+    # S3.5 美感校验 + 自动修复（与主管线一致）
+    from render_validator import validate_and_fix_decomposition
+    d, qa_issues = validate_and_fix_decomposition(d)
+    if qa_issues:
+        print(f"[style_migrate] QA 发现 {len(qa_issues)} 个问题（已自动修复）", flush=True)
 
     # 7. 重算场景边界
     frame = 0
@@ -922,7 +948,9 @@ def _vlm_analyze_motion(video_path: str, scenes: list[dict]) -> list[dict]:
     }
 
     results = []
-    for sc in scenes:
+    # 只对部分场景做 VLM 运动分析（避免 13 个场景 × 75s 超时 = 16 分钟）
+    sample_indices = set(range(0, len(scenes), max(1, len(scenes) // 4)))  # 最多 4 个
+    for si, sc in enumerate(scenes):
         start_f = sc.get("start_frame", 0)
         end_f = sc.get("end_frame", total)
         mid_f = start_f + int((end_f - start_f) * 0.3)
@@ -937,7 +965,7 @@ def _vlm_analyze_motion(video_path: str, scenes: list[dict]) -> list[dict]:
                 frames_b64.append(base64.b64encode(buf).decode())
 
         motion_desc = ""
-        if len(frames_b64) == 2:
+        if si in sample_indices and len(frames_b64) == 2:
             motion_desc = _vlm_call(
                 frames_b64,
                 "分析两帧运动：平移/旋转/缩放/淡入淡出/弹性/级联/飘浮，用/分隔，30字以内。"
@@ -1002,7 +1030,7 @@ def _generate_scene_images(topic, scenes, output_dir, style_profile):
             phase = "build"
 
         prompts = PROMPTS.get(phase, PROMPTS["build"])
-        n_imgs = max(2, min(len(sc.get("elements", [])), 6))
+        n_imgs = max(2, min(len(sc.get("elements", [])), 3))  # 最多 3 张，控制总时间
         paths = []
 
         for j in range(n_imgs):

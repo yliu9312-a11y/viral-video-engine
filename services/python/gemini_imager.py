@@ -3,7 +3,9 @@
 import os
 import base64
 import httpx
+import requests as _requests
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as _FuturesTimeout
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
@@ -49,7 +51,13 @@ def generate_image(
     }
 
     try:
-        resp = httpx.post(url, json=payload, timeout=120.0)
+        # 用 requests + ThreadPoolExecutor 硬超时（httpx 的 timeout 在 TCP ESTABLISHED 后不生效）
+        def _do_request():
+            return _requests.post(url, json=payload, timeout=(10, 45))
+
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            future = pool.submit(_do_request)
+            resp = future.result(timeout=60)  # 硬超时 60s
         resp.raise_for_status()
         data = resp.json()
 
@@ -77,6 +85,9 @@ def generate_image(
         print(f"No image found in response parts: {[list(p.keys()) for p in parts]}")
         return ""
 
+    except _FuturesTimeout:
+        print(f"Gemini image generation hard timeout (60s)")
+        return ""
     except Exception as e:
         print(f"Gemini image generation failed: {e}")
         return ""
