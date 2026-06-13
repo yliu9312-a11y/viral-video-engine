@@ -20,6 +20,7 @@ def generate_image(
     height: int = 1920,
     style_profile=None,
     aspect_ratio: str = "",
+    reference_image_path: str = "",
 ) -> str:
     """Generate an image using Gemini Imagen 3 and save to disk.
 
@@ -30,6 +31,9 @@ def generate_image(
         style_profile: optional StyleProfile to inject visual style into prompt
         aspect_ratio: optional aspect ratio hint e.g. "16:9" or "9:16";
             when non-empty, added to generationConfig.imageConfig per Google API spec
+        reference_image_path: optional path to a reference image; if the file
+            exists it is attached as a style/composition guide with an explicit
+            instruction NOT to copy objects, people, text or logos from it.
 
     Returns:
         path to the saved image, or empty string on failure
@@ -53,10 +57,38 @@ def generate_image(
         # Google 官方字段：imageConfig.aspectRatio
         gen_config["imageConfig"] = {"aspectRatio": aspect_ratio}
 
+    # Build parts list — optionally prepend reference image as style guide
+    text_instruction = f"Generate an image: {prompt}"
+    parts: list[dict] = []
+
+    ref_path = reference_image_path or ""
+    if ref_path and os.path.isfile(ref_path):
+        try:
+            with open(ref_path, "rb") as _rf:
+                _ref_bytes = _rf.read()
+            _ref_b64 = base64.b64encode(_ref_bytes).decode()
+            # Determine mime type from extension
+            _ext = os.path.splitext(ref_path)[1].lower()
+            _mime = "image/jpeg" if _ext in (".jpg", ".jpeg") else "image/png"
+            # Style-guide instruction: do NOT copy content from reference
+            style_instruction = (
+                "Use the attached image ONLY as a style and composition reference "
+                "(color palette, lighting, mood, framing). Generate a completely NEW "
+                f"image about: {prompt}. Do NOT copy any objects, people, text or logos "
+                "from the reference image."
+            )
+            parts = [
+                {"text": style_instruction},
+                {"inlineData": {"mimeType": _mime, "data": _ref_b64}},
+            ]
+        except Exception as _ref_err:
+            print(f"[gemini_imager] Failed to load reference image '{ref_path}': {_ref_err}")
+            parts = [{"text": text_instruction}]
+    else:
+        parts = [{"text": text_instruction}]
+
     payload = {
-        "contents": [{
-            "parts": [{"text": f"Generate an image: {prompt}"}]
-        }],
+        "contents": [{"parts": parts}],
         "generationConfig": gen_config,
     }
 

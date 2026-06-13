@@ -757,16 +757,20 @@ async def decompose(req: DecomposeRequest):
 class StyleMigrateRequest(BaseModel):
     video_path: str
     topic: str
+    allow_reference_pixels: bool = False
 
 
-def _style_migrate_blocking(video_path: str, topic: str) -> dict:
+def _style_migrate_blocking(video_path: str, topic: str, allow_reference_pixels: bool = False) -> dict:
     """同步阻塞版本的风格迁移，供 run_in_executor 调用。"""
     import time as _time
+    import shutil
     from scene_decomposer import (
         decompose_video, decomposition_to_dict, decomposition_from_dict,
         decomposition_to_orchestrator_template, generate_motion_paths_for_decomp,
+        _clamp_to_safe_zone,
     )
     from scene_description import extract_style_profile
+    from render_validator import validate_and_fix_decomposition
 
     job_id = uuid.uuid4().hex[:8]
     output_dir = OUTPUT_BASE / job_id
@@ -780,44 +784,75 @@ def _style_migrate_blocking(video_path: str, topic: str) -> dict:
     d = decomposition_to_dict(decomp)
     print(f"[style_migrate] 分解完成: {len(d.get('scenes', []))} 场景 ({_time.time()-t_start:.0f}s)", flush=True)
 
-    # 2. StyleProfile
+    # 2. 槽位化 — 在任何内容写入前把图片槽位定好、OCR 文字全部清空
+    _slotify_scenes(d, allow_reference_pixels=allow_reference_pixels)
+    print(f"[style_migrate] 槽位化完成 ({_time.time()-t_start:.0f}s)", flush=True)
+
+    # 3. 提取场景参考帧（只用作 Gemini 风格条件输入，绝不写 content_src）
+    ref_frames = _extract_scene_ref_frames(video_path, d, str(output_dir))
+    print(f"[style_migrate] 参考帧提取完成: {len(ref_frames)} 帧 ({_time.time()-t_start:.0f}s)", flush=True)
+
+    # 4. StyleProfile
     style_profile = extract_style_profile(video_path)
     print(f"[style_migrate] 风格: {style_profile.style_family} ({_time.time()-t_start:.0f}s)", flush=True)
 
-    # 3. VLM 运动分析
+    # 4.5 用 style_profile.palette 刷新槽位占位 fill 渐变（比初始填色更精准）
+    if hasattr(style_profile, "palette") and style_profile.palette:
+        palette = style_profile.palette
+        bg_color = palette[0] if palette else "#1a1a2e"
+        accent_color = palette[1] if len(palette) > 1 else "#4b78c7"
+        for sc in d["scenes"]:
+            for el in sc.get("elements", []):
+                if el.get("type") == "image" and not el.get("content_src"):
+                    el.setdefault("appearance", {})["fill"] = (
+                        f"linear-gradient(135deg, {bg_color} 0%, {accent_color} 100%)"
+                    )
+
+    # 5. VLM 运动分析
     scene_motions = _vlm_analyze_motion(video_path, d["scenes"])
     print(f"[style_migrate] 运动分析完成 ({_time.time()-t_start:.0f}s)", flush=True)
 
-    # 4. Gemini 图片生成（注入风格）
-    scene_images = _generate_scene_images(topic, d["scenes"], str(output_dir), style_profile)
+    # 6. LLM 内容计划（文案 + 生图 prompt 前置，与 StyleProfile 对齐）
+    plan = _llm_content_plan(topic, d) or _fallback_content_plan(topic, d)
+    print(f"[style_migrate] 内容计划完成: {len(plan)} 场景 ({_time.time()-t_start:.0f}s)", flush=True)
+
+    # 7. Gemini 图片生成（按计划 prompt + 图像条件 + 图库复用）
+    scene_images = _generate_scene_images(
+        topic, d["scenes"], str(output_dir), style_profile, plan, ref_frames, aspect_ratio="16:9"
+    )
     print(f"[style_migrate] 图片生成完成 ({_time.time()-t_start:.0f}s)", flush=True)
 
-    # 替换图片路径（生成失败时保留原 content_src 裁剪图，避免渲染端整块消失）
+    # 替换图片路径 — 成功填生成图，失败留空 content_src（appearance.fill 已设占位渐变）
     for i, sc in enumerate(d["scenes"]):
         imgs = scene_images.get(i, [])
-        img_idx = 0
+        img_slot_idx = 0
         for el in sc["elements"]:
-            if el.get("type") == "image":
-                if img_idx < len(imgs):
-                    el["content_src"] = f"data/output/{job_id}/generated/{imgs[img_idx]}"
-                    img_idx += 1
-                else:
-                    # 生成失败：保留原 content_src（参考帧裁剪图），不置空
+            if el.get("type") != "image":
+                continue
+            if img_slot_idx < len(imgs):
+                el["content_src"] = f"data/output/{job_id}/generated/{imgs[img_slot_idx]}"
+                img_slot_idx += 1
+            else:
+                # 失败兜底：保持空 src（appearance.fill 占位渐变已设置）
+                # allow_reference_pixels=True 时保留裁剪图旧行为
+                if allow_reference_pixels:
                     orig = el.get("content_src", "")
                     if orig and os.path.isabs(orig):
-                        # 绝对路径改写为相对项目根目录路径
                         fname = os.path.basename(orig)
                         el["content_src"] = f"data/output/{job_id}/{fname}"
-                    # 若已是相对路径或空，保持不变
+                else:
+                    el["content_src"] = ""
 
-    # 5. motion_path 关键帧
-    generate_motion_paths_for_decomp(d, scene_motions, fps=d.get("fps", 30))
+    # 8. 逐场景文案注入（文案已由 plan 规划，与图片同步）
+    _inject_texts_per_scene(d, [p["text"] for p in plan])
 
-    # 6. 注入文字 + 动效（先用默认文字，LLM 编排在 async 层做）
+    # 9. 注入动效（文字已注入，llm_texts={} 保证文字分支不被覆盖）
     _inject_text_and_effects(d, {}, scene_motions)
 
-    # 6.5 质量控制（接入主管线的校验体系）
-    from scene_decomposer import _clamp_to_safe_zone, SAFE_ZONE
+    # 10. motion_path 关键帧
+    generate_motion_paths_for_decomp(d, scene_motions, fps=d.get("fps", 30))
+
+    # 11. safe-zone clamp（保留）
     for sc in d["scenes"]:
         for el in sc.get("elements", []):
             sp = el.get("spatial", {})
@@ -828,30 +863,13 @@ def _style_migrate_blocking(video_path: str, topic: str) -> dict:
             x, y = _clamp_to_safe_zone(x, y, w, h)
             sp["x"] = x
             sp["y"] = y
-        # 限制同屏元素数：按视觉重要性保 top-4（面积 × 接近中心度）
-        MAX_EL = 4
-        from math import hypot
-        visible = [el for el in sc["elements"] if el.get("content_src") or el.get("content_text")]
-        if len(visible) > MAX_EL:
-            def _importance(el):
-                sp = el.get("spatial", {})
-                x = sp.get("x", 50)
-                y = sp.get("y", 50)
-                w = sp.get("width", 30)
-                h = sp.get("height", 30)
-                return (w * h) * (1 - min(1.0, math.hypot(x - 50, y - 50) / 70))
-            scored = sorted(range(len(visible)), key=lambda idx: _importance(visible[idx]), reverse=True)
-            top_indices = set(scored[:MAX_EL])
-            # 保持原相对顺序
-            sc["elements"] = [el for i, el in enumerate(visible) if i in top_indices]
 
-    # S3.5 美感校验 + 自动修复（与主管线一致）
-    from render_validator import validate_and_fix_decomposition
+    # 12. QA 校验 + 自动修复
     d, qa_issues = validate_and_fix_decomposition(d)
     if qa_issues:
         print(f"[style_migrate] QA 发现 {len(qa_issues)} 个问题（已自动修复）", flush=True)
 
-    # 7. 重算场景边界
+    # 13. 重算场景边界
     frame = 0
     for sc in d["scenes"]:
         sc["start_frame"] = frame
@@ -859,8 +877,7 @@ def _style_migrate_blocking(video_path: str, topic: str) -> dict:
         frame += sc["duration_frames"]
     d["total_frames"] = frame
 
-    # C5: 转场接线 — 每个场景 transition_out = 下一场景 entrance_transition 镜像
-    # 语义：该场景结束时如何过渡到下一场景（契约 3）
+    # C5: 转场接线
     VALID_TRANSITIONS = {"cut", "fade", "slide"}
     scenes_list = d["scenes"]
     for si, sc in enumerate(scenes_list):
@@ -875,7 +892,7 @@ def _style_migrate_blocking(video_path: str, topic: str) -> dict:
         else:
             sc["transition_out"] = {"type": "fade", "direction": ""}
 
-    # C6: BGM — 按 style_family 选音轨（契约 1）
+    # C6: BGM
     BGM_MAP = {
         "dark_neon_ui": "bgm_dark.m4a",
         "dark_cinematic": "bgm_dark.m4a",
@@ -894,19 +911,17 @@ def _style_migrate_blocking(video_path: str, topic: str) -> dict:
     with open(decomp_path, "w", encoding="utf-8") as f:
         json.dump(d, f, ensure_ascii=False, indent=2)
 
-    # 复制图片到 web/public（generated png + 裁剪 jpg 全部复制）
-    import shutil
+    # 复制图片到 web/public — generated png 始终复制；裁剪 jpg 仅 allow_reference_pixels=True 时复制
     public_out_dir = PROJECT_ROOT / "web" / "public" / "data" / "output" / job_id
     public_gen_dir = public_out_dir / "generated"
     public_gen_dir.mkdir(parents=True, exist_ok=True)
-    # 复制生成图（png）
     gen_dir = output_dir / "generated"
     if gen_dir.exists():
         for img in gen_dir.glob("*.png"):
             shutil.copy2(img, public_gen_dir / img.name)
-    # 复制裁剪图（jpg，output_dir 根目录）
-    for img in output_dir.glob("*.jpg"):
-        shutil.copy2(img, public_out_dir / img.name)
+    if allow_reference_pixels:
+        for img in output_dir.glob("*.jpg"):
+            shutil.copy2(img, public_out_dir / img.name)
 
     return {
         "success": True,
@@ -939,44 +954,293 @@ async def style_migrate(req: StyleMigrateRequest):
         import asyncio
         loop = asyncio.get_event_loop()
 
-        # 在线程池中运行阻塞工作，不阻塞 uvicorn 事件循环
+        # 在线程池中运行阻塞工作（内容计划 + 生图 + 文案注入已在 blocking 内完成）
+        import functools
         result = await loop.run_in_executor(
-            None, _style_migrate_blocking, req.video_path, req.topic
+            None,
+            functools.partial(
+                _style_migrate_blocking,
+                req.video_path,
+                req.topic,
+                req.allow_reference_pixels,
+            ),
         )
-
-        # LLM 文字编排（async，可以在事件循环中跑）
-        if result.get("success"):
-            try:
-                from animation_orchestrator import orchestrate_from_beats
-                from scene_decomposer import decomposition_to_orchestrator_template, decomposition_from_dict
-                # 重新加载 decomposition 做 LLM 编排
-                decomp_path = result.get("decomp_path", "")
-                if decomp_path and Path(decomp_path).is_file():
-                    with open(decomp_path) as f:
-                        d = json.load(f)
-                    decomp_obj = decomposition_from_dict(d)
-                    template = decomposition_to_orchestrator_template(decomp_obj, topic=req.topic)
-                    spec = await orchestrate_from_beats(template, topic=req.topic, verify=False)
-                    # C7: 从 spec["shots"] 按顺序收集非空 text 列表
-                    texts: list[str] = []
-                    for shot in spec.get("shots", []):
-                        text = shot.get("props", {}).get("text", "")
-                        if text and text.strip():
-                            texts.append(text.strip())
-                    if texts:
-                        _inject_texts_per_scene(d, texts)
-                        with open(decomp_path, "w", encoding="utf-8") as f:
-                            json.dump(d, f, ensure_ascii=False, indent=2)
-                        result["decomposition"] = d
-                    print(f"[style_migrate] LLM 编排完成", flush=True)
-            except Exception as e:
-                print(f"[style_migrate] LLM 编排失败（不影响主流程）: {e}", flush=True)
 
         return result
     except Exception as e:
         import traceback
         traceback.print_exc()
         return {"success": False, "error": str(e)}
+
+
+# ─── Slot table: layout_type → number of image slots ─────────────────────────
+
+_SLOT_TABLE: dict[str, int] = {
+    "full_bleed": 1,
+    "centered": 3,
+    "split": 2,
+    "grid": 4,
+    "radial": 5,
+    "stack": 3,
+}
+
+
+def _slotify_scenes(d: dict, allow_reference_pixels: bool = False) -> None:
+    """将每个场景的元素裁剪为槽位数，并清空所有文字内容。
+
+    图片：按视觉重要性保留 top-N（N 由 layout_type 查 _SLOT_TABLE），
+          依序标注 slot_role="hero"(第1个) / "satellite"(其余)。
+    文字：只保留第 1 个元素，content_text 立即清空 ""（OCR 使命已完成）。
+    allow_reference_pixels=False（默认）：所有图片 content_src 清空，
+          同时设置 appearance.fill 渐变占位（style_profile 刷新前的临时颜色）。
+    """
+
+    _DEFAULT_BG = "#1a1a2e"
+    _DEFAULT_ACCENT = "#4b78c7"
+
+    for sc in d.get("scenes", []):
+        layout = sc.get("layout_type", "centered")
+        n_slots = _SLOT_TABLE.get(layout, 3)
+
+        elements = sc.get("elements", [])
+
+        # — 图片元素：按重要性排序取 top-N，保留原相对顺序 ——————————————————————
+        img_elements = [el for el in elements if el.get("type") == "image"]
+        other_elements = [el for el in elements if el.get("type") != "image"]
+
+        def _img_score(el: dict) -> float:
+            sp = el.get("spatial", {})
+            x = sp.get("x", 50.0)
+            y = sp.get("y", 50.0)
+            w = sp.get("width", 30.0)
+            h = sp.get("height", 30.0)
+            return (w * h) * (1.0 - min(1.0, math.hypot(x - 50, y - 50) / 70.0))
+
+        if len(img_elements) > n_slots:
+            # 确定保留的 indices（在原 img_elements 列表中）
+            ranked = sorted(range(len(img_elements)), key=lambda i: _img_score(img_elements[i]), reverse=True)
+            keep_set = set(ranked[:n_slots])
+            # 保持原相对顺序
+            img_elements = [el for i, el in enumerate(img_elements) if i in keep_set]
+
+        # 标注 slot_role + 清空 src（如需）
+        for slot_i, el in enumerate(img_elements):
+            el["slot_role"] = "hero" if slot_i == 0 else "satellite"
+            if not allow_reference_pixels:
+                el["content_src"] = ""
+                el.setdefault("appearance", {})["fill"] = (
+                    f"linear-gradient(135deg, {_DEFAULT_BG} 0%, {_DEFAULT_ACCENT} 100%)"
+                )
+
+        # — 文字元素：只保留第 1 个，清空 content_text ————————————————————————
+        text_elements = [el for el in other_elements if el.get("type") == "text"]
+        non_text_non_img = [el for el in other_elements if el.get("type") != "text"]
+
+        kept_texts: list[dict] = []
+        for i, el in enumerate(text_elements):
+            el["content_text"] = ""  # OCR 使命已完成，清空
+            if i == 0:
+                kept_texts.append(el)
+            # i > 0：丢弃（多余文字槽位删除）
+
+        # 重组 elements：图片 + 保留文字 + 其他（保持图片在前）
+        sc["elements"] = img_elements + kept_texts + non_text_non_img
+
+
+def _extract_scene_ref_frames(
+    video_path: str, d: dict, output_dir: str
+) -> dict:
+    """为每个场景取中点帧，缩放到宽 640，存为 ref/s{i}_ref.jpg。
+
+    返回 {scene_idx: 绝对路径}。
+    这些图像**只作为 Gemini 的风格参考条件输入，绝不写进任何 content_src**。
+    """
+    import cv2  # noqa: PLC0415
+
+    ref_dir = Path(output_dir) / "ref"
+    ref_dir.mkdir(parents=True, exist_ok=True)
+
+    cap = cv2.VideoCapture(video_path)
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
+
+    result: dict = {}
+    for i, sc in enumerate(d.get("scenes", [])):
+        start_f = sc.get("start_frame", 0)
+        end_f = sc.get("end_frame", total_frames)
+        mid_f = start_f + (end_f - start_f) // 2
+
+        cap.set(cv2.CAP_PROP_POS_FRAMES, mid_f)
+        ret, frame = cap.read()
+        if not ret:
+            continue
+
+        # 缩到宽 640，保持宽高比
+        h_orig, w_orig = frame.shape[:2]
+        scale = 640.0 / w_orig if w_orig > 0 else 1.0
+        new_w = 640
+        new_h = max(1, int(h_orig * scale))
+        frame_small = cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_AREA)
+
+        out_path = str(ref_dir / f"s{i}_ref.jpg")
+        cv2.imwrite(out_path, frame_small, [cv2.IMWRITE_JPEG_QUALITY, 85])
+        result[i] = os.path.abspath(out_path)
+
+    cap.release()
+    return result
+
+
+def _llm_content_plan(topic: str, d: dict) -> list[dict] | None:
+    """LLM 内容规划：逐场景生成主文案 + 生图 prompt。
+
+    输入：场景骨架摘要（序号/phase/时长/layout_type/图片槽位数），不含任何 OCR 文字。
+    输出：[{"text": "中文屏幕主文案≤12字", "image_prompt": "英文生图prompt"}] × 场景数。
+    失败返回 None，调用方用 _fallback_content_plan 兜底。
+    """
+    import httpx  # noqa: PLC0415
+
+    api_key = os.environ.get("MIMO_API_KEY", "")
+    api_url = os.environ.get("MIMO_API_URL", "https://token-plan-cn.xiaomimimo.com/v1")
+    model = os.environ.get("MIMO_MODEL", "mimo-v2.5-pro")
+
+    if not api_key:
+        return None
+
+    scenes = d.get("scenes", [])
+    n = len(scenes)
+    if n == 0:
+        return None
+
+    # 构建场景骨架摘要（绝不包含 OCR 内容）
+    scene_summaries = []
+    for i, sc in enumerate(scenes):
+        if i == 0 or i <= n * 0.25:
+            phase = "hook"
+        elif i >= n * 0.75:
+            phase = "cta"
+        else:
+            phase = "build"
+        layout = sc.get("layout_type", "centered")
+        n_slots = _SLOT_TABLE.get(layout, 3)
+        dur_s = round(sc.get("duration_frames", 90) / max(1, d.get("fps", 30)), 1)
+        scene_summaries.append(
+            f"场景{i}(phase={phase},时长={dur_s}s,layout={layout},图片槽位={n_slots})"
+        )
+
+    system_prompt = (
+        "你是短视频文案专家。根据主题和场景结构，为每个场景生成屏幕文案和生图指令。\n"
+        "要求：\n"
+        "- text：中文主文案，≤12字，与 topic 强相关，各场景不重复；hook 场景要抓人；cta 场景有号召力\n"
+        "- image_prompt：英文生图 prompt，具体名词，与 text 呼应，不含任何参考视频信息\n"
+        "输出格式（JSON object）：\n"
+        '{"scenes": [{"text": "...", "image_prompt": "..."}, ...]}\n'
+        "长度必须与输入场景数完全一致。只输出 JSON，不要其他文字。"
+    )
+    user_msg = f"主题: {topic}\n\n场景结构:\n" + "\n".join(scene_summaries)
+
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_msg},
+        ],
+        "max_tokens": 2000,
+        "temperature": 0.7,
+        "response_format": {"type": "json_object"},
+    }
+
+    for attempt in range(2):
+        try:
+            resp = httpx.post(
+                f"{api_url}/chat/completions",
+                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                json=payload,
+                timeout=60.0,
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            raw = data["choices"][0]["message"]["content"]
+            parsed = json.loads(raw)
+            scenes_out = parsed.get("scenes", [])
+            if len(scenes_out) != n:
+                print(
+                    f"[_llm_content_plan] 长度不符: 期望 {n} 场景, 得到 {len(scenes_out)}",
+                    flush=True,
+                )
+                return None
+            # 校验每条都有必要字段
+            result: list[dict] = []
+            for item in scenes_out:
+                text = str(item.get("text", "")).strip()
+                image_prompt = str(item.get("image_prompt", "")).strip()
+                if not text or not image_prompt:
+                    return None
+                result.append({"text": text[:12], "image_prompt": image_prompt})
+            return result
+        except Exception as exc:
+            print(f"[_llm_content_plan] attempt {attempt+1} failed: {exc}", flush=True)
+            if attempt == 0:
+                import time as _t
+                _t.sleep(2)
+
+    return None
+
+
+def _fallback_content_plan(topic: str, d: dict) -> list[dict]:
+    """内容计划兜底函数 — 不依赖任何外部 API，不含参考视频文字。
+
+    所有文案纯粹基于 topic 生成。
+    """
+    scenes = d.get("scenes", [])
+    n = len(scenes)
+
+    BUILD_TEXTS = ["走近{t}", "发现{t}", "{t}印象", "感受{t}", "探索{t}", "品味{t}"]
+    HOOK_TEMPLATES = [
+        "wide cinematic opening shot, dramatic sky, golden hour, 4K",
+        "iconic establishing shot, strong silhouette, warm tones",
+        "vibrant scene, wide angle, sense of scale, dusk lighting",
+    ]
+    BUILD_TEMPLATES = [
+        "detail shot, natural light, shallow depth of field, lifestyle",
+        "process shot, warm ambient light, authentic feel",
+        "environmental portrait, candid moment, outdoor setting",
+        "architectural detail, geometric pattern, clean lines",
+    ]
+    CTA_TEMPLATES = [
+        "sweeping panorama, dramatic clouds, high vantage point",
+        "night scene, warm lights, long exposure, reflective surfaces",
+        "final wide shot, golden hour, sense of scale, cinematic",
+    ]
+
+    result: list[dict] = []
+    build_idx = 0
+    for i, sc in enumerate(scenes):
+        if i == 0 or i <= n * 0.25:
+            phase = "hook"
+        elif i >= n * 0.75:
+            phase = "cta"
+        else:
+            phase = "build"
+
+        t_short = topic[:10]  # guard against very long topics
+
+        if phase == "hook":
+            text = t_short
+            img_tmpl = HOOK_TEMPLATES[i % len(HOOK_TEMPLATES)]
+        elif phase == "cta":
+            raw = f"{t_short},等你来"
+            text = raw[:12]
+            img_tmpl = CTA_TEMPLATES[i % len(CTA_TEMPLATES)]
+        else:
+            raw = BUILD_TEXTS[build_idx % len(BUILD_TEXTS)].format(t=t_short)
+            text = raw[:12]
+            img_tmpl = BUILD_TEMPLATES[build_idx % len(BUILD_TEMPLATES)]
+            build_idx += 1
+
+        image_prompt = f"{topic}, {img_tmpl}"
+        result.append({"text": text, "image_prompt": image_prompt})
+
+    return result
 
 
 def _vlm_analyze_motion(video_path: str, scenes: list[dict]) -> list[dict]:
@@ -1040,91 +1304,118 @@ def _generate_scene_images(
     scenes: list,
     output_dir: str,
     style_profile,
+    plan: list[dict],
+    ref_frames: dict,
     aspect_ratio: str = "16:9",
 ) -> dict:
-    """Gemini 图片生成（注入风格）。
+    """Gemini 图片生成（按计划 prompt + 图像条件 + 图库复用）。
 
-    prompt 以 topic 开头（主题解耦），模板为与城市无关的通用构图描述。
-    并发生成（max_workers=3）加速。
+    每场景只真实生成 hero 1 张（+ satellite 如槽位≥2 则再生 1 张 alternate）。
+    全局图库复用：第 3 个及以后的 satellite 槽位从已生成图轮转，不再调用 API。
+    失败兜底链：同场景其他生成图 → 全局图库 → 留空（不回填参考裁剪图）。
+    并发=3 保留。
     """
-    from gemini_imager import generate_image
-    from concurrent.futures import ThreadPoolExecutor, as_completed
-
-    # 通用构图模板（英文，不含城市/地名，每次生成以 topic 开头拼接）
-    TEMPLATES: dict[str, list[str]] = {
-        "hook": [
-            "wide cinematic opening shot, dramatic sky, golden hour, 4K",
-            "iconic landmark close-up, strong silhouette, warm tones",
-            "vibrant street scene, wide angle, people in motion, dusk",
-        ],
-        "build": [
-            "detail shot, natural light, shallow depth of field, lifestyle",
-            "process shot, hands at work, warm ambient light, authentic",
-            "environmental portrait, candid moment, outdoor setting",
-            "architectural detail, geometric pattern, clean lines",
-        ],
-        "cta": [
-            "sweeping panorama, full scene, dramatic clouds, high vantage point",
-            "night scene, city lights, long exposure, reflective surfaces",
-            "final wide shot, golden hour, sense of scale, cinematic",
-        ],
-    }
+    from gemini_imager import generate_image  # noqa: PLC0415
+    from concurrent.futures import ThreadPoolExecutor, as_completed  # noqa: PLC0415
 
     n = len(scenes)
     img_dir = Path(output_dir) / "generated"
     img_dir.mkdir(parents=True, exist_ok=True)
 
-    # 构建任务列表
-    tasks: list[tuple[int, int, str, str]] = []  # (scene_idx, img_idx, fname, prompt)
+    # 构建实际生成任务：hero + 可能的 alternate（每场景最多 2 次 API 调用）
+    # task = (scene_idx, slot_label, fname, prompt, ref_path)
+    tasks: list[tuple[int, str, str, str, str]] = []
+
     for i, sc in enumerate(scenes):
-        if i == 0 or i <= n * 0.25:
-            phase = "hook"
-        elif i >= n * 0.75:
-            phase = "cta"
+        layout = sc.get("layout_type", "centered")
+        n_slots = _SLOT_TABLE.get(layout, 3)
+        base_prompt = plan[i]["image_prompt"] if i < len(plan) else f"{topic}, cinematic scene"
+        ref_path = ref_frames.get(i, "")
+
+        # hero — 1 张主图
+        hero_fname = f"s{i}_hero.png"
+        hero_fpath = str(img_dir / hero_fname)
+        if not Path(hero_fpath).exists():
+            tasks.append((i, "hero", hero_fname, base_prompt, ref_path))
         else:
-            phase = "build"
+            tasks.append((i, "hero", hero_fname, "", ref_path))  # 已存在，跳过生成
 
-        templates = TEMPLATES.get(phase, TEMPLATES["build"])
-        n_imgs = max(2, min(len(sc.get("elements", [])), 3))
-
-        for j in range(n_imgs):
-            fname = f"s{i}_gen_{j}.png"
-            fpath = str(img_dir / fname)
-            if Path(fpath).exists():
-                tasks.append((i, j, fname, ""))  # 已存在，跳过生成
-                continue
-            # prompt 以 topic 开头保证主题相关性
-            template = templates[j % len(templates)]
-            prompt = f"{topic}, {template}"
-            tasks.append((i, j, fname, prompt))
+        # alternate — 若槽位≥2，再生 1 张
+        if n_slots >= 2:
+            alt_fname = f"s{i}_alt.png"
+            alt_fpath = str(img_dir / alt_fname)
+            alt_prompt = base_prompt + ", alternate angle, detail shot"
+            if not Path(alt_fpath).exists():
+                tasks.append((i, "alt", alt_fname, alt_prompt, ref_path))
+            else:
+                tasks.append((i, "alt", alt_fname, "", ref_path))
 
     # 分组：需要生成 vs 已存在
-    to_generate = [(si, ji, fn, pr) for si, ji, fn, pr in tasks if pr]
-    already_done = [(si, ji, fn) for si, ji, fn, pr in tasks if not pr]
+    to_generate = [(si, sl, fn, pr, rp) for si, sl, fn, pr, rp in tasks if pr]
+    already_done = [(si, sl, fn) for si, sl, fn, pr, rp in tasks if not pr]
 
+    # scene_images: {scene_idx: [fname, ...]} — 成功生成/已存在的文件名列表
     scene_images: dict[int, list[str]] = {}
-    for si, ji, fn in already_done:
+    for si, sl, fn in already_done:
         scene_images.setdefault(si, []).append(fn)
 
-    def _gen_one(args):
-        si, ji, fname, prompt = args
+    # 全局图库（用于 satellite 复用）
+    global_library: list[str] = []
+
+    def _gen_one(args: tuple[int, str, str, str, str]):
+        si, slot_label, fname, prompt, ref_path = args
         fpath = str(img_dir / fname)
-        result = generate_image(
+        res = generate_image(
             prompt, fpath,
             width=1280, height=720,
             style_profile=style_profile,
             aspect_ratio=aspect_ratio,
+            reference_image_path=ref_path,
         )
-        return si, fname, bool(result)
+        return si, slot_label, fname, bool(res)
 
     with ThreadPoolExecutor(max_workers=3) as pool:
         futures = {pool.submit(_gen_one, t): t for t in to_generate}
         for fut in as_completed(futures):
-            si, fname, ok = fut.result()
+            si, slot_label, fname, ok = fut.result()
             if ok:
                 scene_images.setdefault(si, []).append(fname)
+                global_library.append(fname)
 
-    return scene_images
+    # 补充全局图库（已存在的图也算）
+    for si, imgs in scene_images.items():
+        for fn in imgs:
+            if fn not in global_library:
+                global_library.append(fn)
+
+    # 为每个场景按槽位数填满图片列表
+    # satellite 第 3+ 张从全局图库轮转，不重复使用本场景已有图
+    gl_cycle_idx = 0
+    final_images: dict[int, list[str]] = {}
+    for i, sc in enumerate(scenes):
+        layout = sc.get("layout_type", "centered")
+        n_slots = _SLOT_TABLE.get(layout, 3)
+        got = list(scene_images.get(i, []))
+        filled: list[str] = list(got)  # hero + alt（如果生成成功）
+
+        # 补 satellite 槽（第 3+ 个，从全局图库轮转）
+        for _ in range(len(filled), n_slots):
+            # 找一张本场景尚未使用的全局图
+            picked = ""
+            tried = 0
+            total_gl = len(global_library)
+            while tried < total_gl:
+                candidate = global_library[gl_cycle_idx % max(1, total_gl)]
+                gl_cycle_idx += 1
+                tried += 1
+                if candidate not in filled:
+                    picked = candidate
+                    break
+            filled.append(picked)  # picked="" 表示留空（渲染端画占位块）
+
+        final_images[i] = filled
+
+    return final_images
 
 
 def _inject_texts_per_scene(d: dict, texts: list[str]) -> None:

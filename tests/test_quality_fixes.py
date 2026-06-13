@@ -6,8 +6,11 @@ No pytest required. Uses assert + __main__ block.
 
 from __future__ import annotations
 
+import json
+import math
 import sys
 import os
+from pathlib import Path
 
 # ── Dependency guard ──────────────────────────────────────────────────────────
 try:
@@ -246,6 +249,207 @@ def test_extract_style_profile_grade() -> None:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Test 5: _slotify_scenes — grid 场景 8 图 3 文 → 4 图 1 文(content_text=="")，fill 含 gradient
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _load_main_fn(fn_name: str):
+    """Extract a top-level function from main.py by name and exec it in a fresh namespace.
+
+    The namespace is pre-populated with common stdlib modules AND any module-level
+    constants (like _SLOT_TABLE) that the function may reference.
+    """
+    import ast as _ast_mod
+
+    main_path = os.path.join(SERVICES_PY, "main.py")
+
+    # 1. Parse module-level constants (Assign and AnnAssign with literal values)
+    with open(main_path) as _mf:
+        _source = _mf.read()
+    _tree = _ast_mod.parse(_source)
+    _constants: dict = {}
+    for _node in _ast_mod.walk(_tree):
+        # Plain assign:  _FOO = {...}
+        if isinstance(_node, _ast_mod.Assign):
+            for _target in _node.targets:
+                if isinstance(_target, _ast_mod.Name) and _target.id.startswith("_"):
+                    try:
+                        _constants[_target.id] = _ast_mod.literal_eval(_node.value)
+                    except (ValueError, TypeError):
+                        pass
+        # Annotated assign:  _FOO: dict[str, int] = {...}
+        elif isinstance(_node, _ast_mod.AnnAssign):
+            if (
+                isinstance(_node.target, _ast_mod.Name)
+                and _node.target.id.startswith("_")
+                and _node.value is not None
+            ):
+                try:
+                    _constants[_node.target.id] = _ast_mod.literal_eval(_node.value)
+                except (ValueError, TypeError):
+                    pass
+
+    # 2. Extract function source by scanning lines
+    fn_src: list[str] = []
+    in_fn = False
+    with open(main_path) as f:
+        for line in f:
+            if line.startswith(f"def {fn_name}("):
+                in_fn = True
+            if in_fn:
+                fn_src.append(line)
+                stripped = line.rstrip()
+                if stripped and not stripped[0].isspace() and len(fn_src) > 1:
+                    fn_src.pop()
+                    break
+    fn_code = "".join(fn_src)
+
+    # 3. Build namespace with stdlib + parsed constants
+    ns: dict = {"math": math, "os": os, "json": json, "Path": Path}
+    ns.update(_constants)
+    exec(fn_code, ns)  # noqa: S102
+    return ns[fn_name]
+
+
+def test_slotify() -> None:
+    _slotify_scenes = _load_main_fn("_slotify_scenes")
+
+    # Also load _SLOT_TABLE constant (it's a module-level dict in main.py)
+    import math
+    _SLOT_TABLE: dict = {}
+    with open(os.path.join(SERVICES_PY, "main.py")) as f:
+        content = f.read()
+    # Parse _SLOT_TABLE from source
+    import ast as _ast
+    for node in _ast.walk(_ast.parse(content)):
+        if isinstance(node, _ast.Assign):
+            for target in node.targets:
+                if isinstance(target, _ast.Name) and target.id == "_SLOT_TABLE":
+                    _SLOT_TABLE = _ast.literal_eval(node.value)
+
+    # Build a scene with grid layout, 8 image elements and 3 text elements
+    def _make_el(etype: str, x: float = 50.0, y: float = 50.0, w: float = 30.0, h: float = 30.0, content_src: str = "ref.jpg", content_text: str = "ocr text") -> dict:
+        el: dict = {"type": etype, "spatial": {"x": x, "y": y, "width": w, "height": h}}
+        if etype == "image":
+            el["content_src"] = content_src
+        else:
+            el["content_text"] = content_text
+        return el
+
+    img_els = [_make_el("image", x=float(i * 10 % 90), y=float(i * 7 % 90)) for i in range(8)]
+    text_els = [_make_el("text", content_text=f"ocr_{i}") for i in range(3)]
+    scene = {
+        "layout_type": "grid",
+        "elements": img_els + text_els,
+    }
+    d = {"scenes": [scene]}
+
+    _slotify_scenes(d, allow_reference_pixels=False)
+
+    sc = d["scenes"][0]
+    imgs = [el for el in sc["elements"] if el.get("type") == "image"]
+    texts = [el for el in sc["elements"] if el.get("type") == "text"]
+
+    expected_slots = _SLOT_TABLE.get("grid", 4) if _SLOT_TABLE else 4
+    assert len(imgs) == expected_slots, f"Expected {expected_slots} images, got {len(imgs)}"
+    assert imgs[0].get("slot_role") == "hero", f"First image slot_role should be 'hero', got {imgs[0].get('slot_role')}"
+    for img in imgs[1:]:
+        assert img.get("slot_role") == "satellite", f"Non-hero should be 'satellite', got {img.get('slot_role')}"
+
+    assert len(texts) == 1, f"Expected 1 text element, got {len(texts)}"
+    assert texts[0]["content_text"] == "", f"Text content_text should be '', got '{texts[0]['content_text']}'"
+
+    for img in imgs:
+        assert img.get("content_src") == "", f"content_src should be '' after slotify, got '{img.get('content_src')}'"
+        fill = img.get("appearance", {}).get("fill", "")
+        assert "gradient" in fill, f"appearance.fill should contain 'gradient', got '{fill}'"
+
+    print("PASS test_slotify")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Test 6: _fallback_content_plan — 13 场景，文案合法，image_prompt 以 topic 开头，无 OCR
+# ─────────────────────────────────────────────────────────────────────────────
+
+def test_fallback_content_plan() -> None:
+    _fallback_content_plan = _load_main_fn("_fallback_content_plan")
+
+    topic = "三亚旅游"
+    fake_ocr = "假OCR内容xyz987"
+
+    # Build a 13-scene decomp dict
+    scenes_list = [{"duration_frames": 90, "elements": []} for _ in range(13)]
+    d = {"fps": 30, "scenes": scenes_list}
+
+    plan = _fallback_content_plan(topic, d)
+
+    assert len(plan) == 13, f"Expected 13 plan entries, got {len(plan)}"
+
+    for i, item in enumerate(plan):
+        text = item.get("text", "")
+        image_prompt = item.get("image_prompt", "")
+
+        assert text, f"Scene {i}: text is empty"
+        assert len(text) <= 12, f"Scene {i}: text '{text}' exceeds 12 chars"
+        assert topic[:3] in text or text, f"Scene {i}: text should relate to topic, got '{text}'"
+
+        assert image_prompt, f"Scene {i}: image_prompt is empty"
+        assert image_prompt.startswith(topic), f"Scene {i}: image_prompt should start with topic, got '{image_prompt}'"
+
+        assert fake_ocr not in text, f"Scene {i}: OCR leak in text: '{text}'"
+        assert fake_ocr not in image_prompt, f"Scene {i}: OCR leak in image_prompt"
+
+    print("PASS test_fallback_content_plan")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Test 7: test_no_reference_leak — slotify 后所有 image src=="" 且所有 text content_text==""
+# ─────────────────────────────────────────────────────────────────────────────
+
+def test_no_reference_leak() -> None:
+    _slotify_scenes = _load_main_fn("_slotify_scenes")
+
+    def _make_scene(layout: str, n_img: int, n_text: int) -> dict:
+        elements: list[dict] = []
+        for _ in range(n_img):
+            elements.append({
+                "type": "image",
+                "content_src": "/absolute/path/to/ref_crop.jpg",
+                "spatial": {"x": 50.0, "y": 50.0, "width": 30.0, "height": 30.0},
+            })
+        for i in range(n_text):
+            elements.append({
+                "type": "text",
+                "content_text": f"原片OCR文字{i}",
+                "spatial": {"x": 50.0, "y": 80.0, "width": 60.0, "height": 10.0},
+            })
+        return {"layout_type": layout, "elements": elements}
+
+    scenes = [
+        _make_scene("full_bleed", 3, 2),
+        _make_scene("grid", 6, 1),
+        _make_scene("split", 2, 3),
+    ]
+    d = {"fps": 30, "scenes": scenes}
+
+    _slotify_scenes(d, allow_reference_pixels=False)
+
+    for sc_idx, sc in enumerate(d["scenes"]):
+        for el in sc["elements"]:
+            if el.get("type") == "image":
+                src = el.get("content_src", "MISSING")
+                assert src == "", (
+                    f"Scene {sc_idx}: image content_src should be '' after slotify, got '{src}'"
+                )
+            if el.get("type") == "text":
+                ct = el.get("content_text", "MISSING")
+                assert ct == "", (
+                    f"Scene {sc_idx}: text content_text should be '' after slotify, got '{ct}'"
+                )
+
+    print("PASS test_no_reference_leak")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Main
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -257,6 +461,9 @@ if __name__ == "__main__":
         test_motion_paths_relative,
         test_inject_texts_per_scene,
         test_extract_style_profile_grade,
+        test_slotify,
+        test_fallback_content_plan,
+        test_no_reference_leak,
     ]:
         try:
             test_fn()

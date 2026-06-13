@@ -833,7 +833,11 @@ const SceneStage: React.FC<{
   fps: number;
   sceneLocalFrame: number;
 }> = ({ scene, fps, sceneLocalFrame }) => {
-  const imageElements = scene.elements.filter((el) => el.type === "image" && el.content_src);
+  // 有图渲图;空 src 但显式设了 appearance.fill 的槽位渲 palette 占位块(AnimatedInner 占位分支)。
+  // 旧数据(空 src 且无 fill)仍被过滤,避免 SAM2 过检的幽灵元素上屏。
+  const imageElements = scene.elements.filter(
+    (el) => el.type === "image" && (el.content_src || el.appearance?.fill)
+  );
 
   return (
     <AbsoluteFill
@@ -887,8 +891,10 @@ const SceneGrid: React.FC<{
   sceneLocalFrame: number;
 }> = ({ scene, fps, sceneLocalFrame }) => {
   const layoutType = scene.layout_type || "centered_hero";
-  // 只渲染有图片的元素到 Grid（过滤掉空 content_src 的占位块，文字走 TextOverlayLayer）
-  const imageElements = scene.elements.filter((el) => el.type === "image" && el.content_src);
+  // 有图渲图;空 src 但设了 fill 的槽位渲占位块;旧数据(无 fill)过滤(文字走 TextOverlayLayer)
+  const imageElements = scene.elements.filter(
+    (el) => el.type === "image" && (el.content_src || el.appearance?.fill)
+  );
   const nImages = imageElements.length;
 
   // 动态查找：先查预定义，再按元素数动态生成
@@ -1074,7 +1080,9 @@ export const MultiSceneVideo: React.FC<{ decomposition: VideoDecompositionData }
   }
 
   // 文字 → 焦点规格（图片数 > 0 时需要 scrim）
-  const hasImages = currentScene.elements.some((el) => el.type === "image" && el.content_src);
+  const hasImages = currentScene.elements.some(
+    (el) => el.type === "image" && (el.content_src || el.appearance?.fill)
+  );
   const focusTexts = textElementsToFocusSpecs(
     currentScene.elements,
     decomposition.canvas_height
